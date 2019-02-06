@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom';
+// import { Redirect } from 'react-router-dom';
 import axios from 'axios'
 
 export default class Login extends React.Component {
@@ -23,6 +23,7 @@ export default class Login extends React.Component {
       .then(r => {
         localStorage.setItem('token', r.data.jwt)
         this.props.changeAccountAndUserState(r.data.user.bank_account, r.data.user.username)
+        this.props.navBarHiddenChange()
         this.props.history.push('/choosestocks')
       })
     }
@@ -45,3 +46,5 @@ export default class Login extends React.Component {
     )
   }
 }
+
+// this.window.alert('wrong username/password')
