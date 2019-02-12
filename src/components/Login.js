@@ -8,10 +8,15 @@ export default class Login extends React.Component {
     username:'',
     password:''
   }
+
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
     })
+  }
+
+  findUser = () => {
+    this.props.findUser(this.state.username)
   }
 
     handleSubmit = (e) => {
@@ -21,9 +26,11 @@ export default class Login extends React.Component {
               password: this.state.password
       })
       .then(r => {
+        this.findUser()
         localStorage.setItem('token', r.data.jwt)
         this.props.changeAccountAndUserState(r.data.user.bank_account, r.data.user.username)
         this.props.navBarHiddenChange()
+        this.props.handleStocksViewedAfterLogin()
         this.props.history.push('/choosestocks')
       })
     }

@@ -5,3 +5,15 @@ navbar
 bank account that is on every screen
 chart for stock price
 logout changenavbar to hidden
+
+timer
+unlimited earnings
+stars
+buy actual stock
+
+
+
+---find the users id and or object on login. then post their chosen stock to portfolios index. then fetch all the portfolio data and filter based on the current user id from login
+
+
+to do: only post uniq stocks

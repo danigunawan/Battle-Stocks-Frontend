@@ -7,10 +7,10 @@ export default class Stocks extends React.Component {
 
     return (
       <div>
-          {this.props.chosenStockUrlsLength >= 4? <h1>Given price per share of your chosen stocks ONE YEAR AGO: <br/>1) Did they Increase/Decrease?<br />2)Current Price?<br />------------------------------------<br />Reward:<br /> Both currect? Double Account. <br /> Incorrect? -$500 and -Bet.<br /> 1/2? Receive half your bet.</h1>
+          {this.props.chosenStockUrlsLength >= 1? <h1>Given price per share of your chosen stocks ONE YEAR AGO: <br/>1) Did they Increase/Decrease?<br />2)Current Price?<br />------------------------------------<br />Reward:<br /> Both currect? Double Account. <br /> Incorrect? -$500 and -Bet.<br /> 1/2? Receive half your bet.</h1>
           :
-          <h1>The name of the game is BattleStocks!!!!!<br />Choose four stocks to start:</h1>}
-            {this.props.chosenStockUrlsLength >= 4 ?
+          <h1>The name of the game is BattleStocks!!!!!<br />Choose your stock:</h1>}
+            {this.props.chosenStockUrlsLength >= 1 ?
               this.props.chosenStockUrls.map(stock =>{
               return (
                 <Stock
@@ -19,7 +19,7 @@ export default class Stocks extends React.Component {
                 clicked={stock.clicked}
                 symbol={stock.symbol}
                 logo={stock.logo}
-                companyName={stock.companyName}
+                name={stock.name}
                 chosenStockUrlsLength={this.props.chosenStockUrlsLength}
                 />
               )
@@ -32,13 +32,13 @@ export default class Stocks extends React.Component {
           clicked={stock.clicked}
           symbol={stock.symbol}
           logo={stock.logo}
-          companyName={stock.companyName}
+          name={stock.name}
           chosenStockUrlsLength={this.props.chosenStockUrlsLength}
           />
         )
       })
         }
-        {this.props.chosenStockUrlsLength >= 4? <button onClick={() => this.props.history.push('/Chosenstockchart1')}>Let's begin</button> : <></>}
+        {this.props.chosenStockUrlsLength >= 1? <button onClick={() => this.props.history.push('/Chosenstockchart1')}>Let's Gamble</button> : <></>}
       </div>
     )
   }

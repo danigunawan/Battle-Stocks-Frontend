@@ -1,6 +1,4 @@
 import React from 'react';
-
-
 import {
   XYPlot,
   XAxis,
@@ -24,9 +22,7 @@ export default class Chosenstockchart1 extends React.Component{
     guessedPriceRight: false,
     bet:null,
     difference:null
-  }
-
-
+    }
 
   handleDecrease = () => {
     this.setState({decrease: !this.state.decrease})
@@ -68,46 +64,76 @@ export default class Chosenstockchart1 extends React.Component{
   handleWin = () => {
     let accountChange = this.props.account + (this.state.bet * 2)
     this.props.handleAccount(accountChange)
-    return this.props.account + (this.state.bet * 2)
-  }
-
+    let adjustment = this.props.account + (this.state.bet * 2)
+    fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        bank_account: adjustment
+      })
+    })//fetch end
+    .then(r=>{
+      return adjustment
+    })
+  }//handle win end
+//////////////////////////////////////half lost////////////////////////////////////////////////////////////////
   handleHalfLost = () => {
     let accountChange = this.props.account + (this.state.bet / 2)
     this.props.handleAccount(accountChange)
-    return this.props.account + (this.state.bet / 2)
-  }
+      fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          bank_account: accountChange,
+        })
+      })
+      fetch('http://localhost:3000/api/v1/portfoliostocks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          "user_id": this.props.user.id,
+          "stock_id": this.props.chosenStockUrls[0].id
+        })
+      })
+  }//handlehalflost/////////////////////////////////////////////////////////////////////////////////
 
   handleCompletelyLost = () =>{
     let accountChange = this.props.account - 500 - this.state.bet
     this.props.handleAccount(accountChange)
-    return this.props.account - 500
-  }
+    let adjustment = this.props.account - 500
+
+    fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        bank_account: adjustment
+
+      })
+    })//fetch end
+    .then(r=>{
+      return adjustment
+    })
+  }//complete lost////////////////////////////////////////////
 
   render(){
-    // console.log(this.state.decrease)
-    // console.log(this.state.increase)
-    // console.log(this.state.input)
-    // console.log(this.state.currentPrice)
-    // console.log(this.state.difference)
-    //  console.log(this.state.completelylost)
-    //   console.log(this.state.won)
-    //   console.log(this.state.halflost)
-    //   console.log(this.state.halflost)
-    //   console.log(this.state.guessedIncreaseDecreaseRight)
-    //  console.log(this.state.guessedPriceRight)
-    //  console.log(this.state.bet)
-// 0:
-// clicked: true
-// companyName: "Alibaba Group Holding Limited"
-// id: 0
-// logo: "https://storage.googleapis.com/iex/api/logos/BABA.png"
-// oneYrPrice: 183
-// openPrice: 166.16
+    console.log(this.props)
     return (
       <div>
             {this.state.won?<h1>Winner!<br /> Price Difference: ${this.state.difference.toFixed(2)} <br /> You doubled your bet of ${this.state.bet} to ${this.state.bet * 2} <br /> New Balance: ${this.props.account}</h1> : this.state.halflost? <h1>You got half your bet of ${this.state.bet} added to your account!<br /> Your Winnings: ${this.state.bet / 2}<br /> New Balance: ${this.props.account}</h1> : this.state.completelylost? <h1>You lost this round, onto the next!<br />Loss: -$500 <br /> Bet: -${this.state.bet}! <br /> New Balance: ${this.props.account}</h1> :
             <div>
-            <h1>{this.props.chosenStockUrls[0].companyName}</h1>
+            <h1>{this.props.chosenStockUrls[0].name}</h1>
             <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice}</h3>
             {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice}</h3> : <></>}
                 <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
@@ -140,7 +166,7 @@ export default class Chosenstockchart1 extends React.Component{
                         placeholder="Bet?"
                         onChange={event => {this.setState({bet: event.target.value})}}
                       />
-                      <button hidden type="submit">Submit</button>
+                      <br />{this.state.input === ''? <></> : <button type="submit">Submit</button>}
                     </form>
                   </div>
                 <br />
@@ -150,7 +176,7 @@ export default class Chosenstockchart1 extends React.Component{
               <div>
               {this.state.won === false && this.state.halflost === false && this.state.completelylost === false? <></> :
               <div>
-              <h1>{this.props.chosenStockUrls[0].companyName}</h1>
+              <h1>{this.props.chosenStockUrls[0].name}</h1>
               <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice}</h3>
               {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice}</h3> : <></>}
                   <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
@@ -169,6 +195,7 @@ export default class Chosenstockchart1 extends React.Component{
                 </div>
               }
               </div>
+              {this.state.completelylost || this.state.won || this.state.halflost? <button onClick={()=>{this.props.history.push('/portfolio')}}>Head to your portfolio</button> : this.state.difference? <button onClick={()=>{this.props.history.push('/choosestocks')}}>Home</button> : <></>}
       </div>
     )
             }

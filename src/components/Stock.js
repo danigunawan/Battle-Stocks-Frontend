@@ -9,17 +9,17 @@ export default class Stock extends React.Component {
   render(){
     return (
       <div>
-      {this.props.clicked && this.props.chosenStockUrlsLength >= 4?
+      {this.props.clicked && this.props.chosenStockUrlsLength >= 1?
         <div>
         <br /> Your Chosen Stock:<br /><br />
-        {this.props.companyName}<br />
+        {this.props.name}<br />
         {this.props.symbol}<br />
         <img alt="" width="100" height="120" src={this.props.logo} /><br /><br />
       </div> : this.props.clicked?
       <></>
       :
       <div>
-        {this.props.companyName}<br />
+        {this.props.name}<br />
         {this.props.symbol}<br />
         <img alt="" src={this.props.logo} width="100" height="120"  /><br />
         <button onClick={this.handleClick}>Pick Stock</button>
