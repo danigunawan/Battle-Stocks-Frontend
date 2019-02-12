@@ -64,7 +64,13 @@ export default class Chosenstockchart1 extends React.Component{
   handleWin = () => {
     let accountChange = this.props.account + (this.state.bet * 2)
     this.props.handleAccount(accountChange)
-    let adjustment = this.props.account + (this.state.bet * 2)
+    fetch('http://localhost:3000/api/v1/stocks')
+    .then(r=>r.json())
+    .then(r=>{
+
+    const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrls[0].symbol)
+
+    debugger
     fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
       method: 'PATCH',
       headers: {
@@ -72,13 +78,28 @@ export default class Chosenstockchart1 extends React.Component{
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        bank_account: adjustment
+        bank_account: accountChange
       })
     })//fetch end
     .then(r=>{
-      return adjustment
-    })
-  }//handle win end
+      debugger
+    fetch('http://localhost:3000/api/v1/portfoliostocks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "user_id": this.props.user.id,
+        "stock_id": selectedStockId.id,
+        "win":true
+      })
+    })//fetch end
+  })//promise end
+  debugger
+    this.props.clearChosenStockUrlsState()
+  }) //promise end
+}//handle win end
 //////////////////////////////////////half lost////////////////////////////////////////////////////////////////
   handleHalfLost = () => {
     let accountChange = this.props.account + (this.state.bet / 2)

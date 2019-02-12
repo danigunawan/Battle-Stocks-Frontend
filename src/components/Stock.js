@@ -2,21 +2,20 @@ import React from 'react'
 
 export default class Stock extends React.Component {
 
-  handleClick = (e) => {
-    this.props.changeClickedAndPushStockIntoChosenStockUrlsState(this.props.clicked, this.props.id)
+  handleClick = () => {
+    this.props.pushStockIntoChosenStockUrlsState(this.props.symbol)
   }
 
   render(){
     return (
       <div>
-      {this.props.clicked && this.props.chosenStockUrlsLength >= 1?
+      {this.props.chosenStockUrlsLength >= 1?
         <div>
         <br /> Your Chosen Stock:<br /><br />
         {this.props.name}<br />
         {this.props.symbol}<br />
         <img alt="" width="100" height="120" src={this.props.logo} /><br /><br />
-      </div> : this.props.clicked?
-      <></>
+      </div>
       :
       <div>
         {this.props.name}<br />

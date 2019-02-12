@@ -48,7 +48,7 @@ export default class App extends React.Component {
     .then(r=>r.json())
     .then(r=>{
       const stockMap = r.map((stock, i)=>{
-        return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open, clicked:false, id:i}
+        return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
       })
       this.setState({infocus:stockMap})
     })
@@ -78,7 +78,7 @@ export default class App extends React.Component {
   .then(r=>r.json())
   .then(r=>{
     const stockMap = r.map((stock, i)=>{
-      return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open, clicked:false, id:i}
+      return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
     })
     this.setState({infocustwo:stockMap})
   })
@@ -108,7 +108,7 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 .then(r=>r.json())
 .then(r=>{
   const stockMap = r.map((stock, i)=>{
-    return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open, clicked:false, id:i}
+    return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
   })
   this.setState({infocusthree:stockMap})
 })
@@ -239,14 +239,19 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 // }///end of async component did mount////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //
-//   changeClickedAndPushStockIntoChosenStockUrlsState = (clicked, id) => {
-//      const selectedStock = this.state.infocusmerged.find(stock => stock.symbol === id)
-//      selectedStock.clicked = !selectedStock.clicked
-//      this.setState({chosenStockUrls:selectedStock})
-//      const updatedArray = this.state.infocusmerged.map(stock => stock.symbol === id ? selectedStock : stock )
-//      this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]})
-//  }
-//
+  pushStockIntoChosenStockUrlsState = (symbol) => {
+     const selectedStock = this.state.infocusmerged.find(stock => stock.symbol === symbol)
+
+     this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]})
+     // const updatedArray = this.state.infocusmerged.map(stock => stock.symbol === id ? selectedStock : stock )
+     // this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]})
+ }
+
+ clearChosenStockUrlsState = () => {
+   debugger
+   this.setState({chosenStockUrls:[]})
+ }
+
 // //   fetch('http://localhost:3000/api/v1/profile', {
 // //   method: 'GET',
 // //   headers: {
@@ -260,15 +265,16 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 //   }
 
   render(){//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    console.log(this.state.chosenStockUrls)
     return(
       <Router>
         <div>
         <Route exact path='/' render={props => <Login handleStocksViewedAfterLogin={this.handleStocksViewedAfterLogin} findUser={this.findUser} {...props} user={this.state.user} changeAccountAndUserState={this.changeAccountAndUserState} navBarHiddenChange={this.navBarHiddenChange}/>}
         />
         {(this.state.navBarHidden) ? null : <Navbar account={this.state.account}/>}
-        <Route exact path='/choosestocks' render={props => <Stocks {...props}  chosenStockUrlsLength={this.state.chosenStockUrls.length} chosenStockUrls={this.state.chosenStockUrls} changeClickedAndPushStockIntoChosenStockUrlsState={this.changeClickedAndPushStockIntoChosenStockUrlsState} infocus={this.state.infocusmerged} />}
+        <Route exact path='/choosestocks' render={props => <Stocks {...props}  chosenStockUrlsLength={this.state.chosenStockUrls.length} chosenStockUrls={this.state.chosenStockUrls} pushStockIntoChosenStockUrlsState={this.pushStockIntoChosenStockUrlsState} infocus={this.state.infocusmerged} />}
         />
-        <Route exact path='/Chosenstockchart1' render={props => <Chosenstockchart1 handleAccount={this.handleAccount} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
+        <Route exact path='/Chosenstockchart1' render={props => <Chosenstockchart1 handleAccount={this.handleAccount} clearChosenStockUrlsState={this.clearChosenStockUrlsState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
         />
         <Route exact path='/portfolio' render={props => <Portfolio handleAccount={this.handleAccount} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState}{...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
         />

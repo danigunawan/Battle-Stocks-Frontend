@@ -4,7 +4,7 @@ import Stock from './Stock'
 export default class Stocks extends React.Component {
 
   render(){
-
+    console.log(this.props.chosenStockUrlsLength)
     return (
       <div>
           {this.props.chosenStockUrlsLength >= 1? <h1>Given price per share of your chosen stocks ONE YEAR AGO: <br/>1) Did they Increase/Decrease?<br />2)Current Price?<br />------------------------------------<br />Reward:<br /> Both currect? Double Account. <br /> Incorrect? -$500 and -Bet.<br /> 1/2? Receive half your bet.</h1>
@@ -14,7 +14,7 @@ export default class Stocks extends React.Component {
               this.props.chosenStockUrls.map(stock =>{
               return (
                 <Stock
-                changeClickedAndPushStockIntoChosenStockUrlsState={this.props.changeClickedAndPushStockIntoChosenStockUrlsState}
+                pushStockIntoChosenStockUrlsState={this.props.pushStockIntoChosenStockUrlsState}
                 id={stock.id}
                 clicked={stock.clicked}
                 symbol={stock.symbol}
@@ -28,7 +28,7 @@ export default class Stocks extends React.Component {
         this.props.infocus.map(stock =>{
         return (
           <Stock
-          changeClickedAndPushStockIntoChosenStockUrlsState={this.props.changeClickedAndPushStockIntoChosenStockUrlsState} id={stock.symbol}
+          pushStockIntoChosenStockUrlsState={this.props.pushStockIntoChosenStockUrlsState} id={stock.symbol}
           clicked={stock.clicked}
           symbol={stock.symbol}
           logo={stock.logo}
