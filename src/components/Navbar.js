@@ -1,19 +1,17 @@
 import React, { Component } from 'react'
 import { Input, Menu, Label } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
 
 export default class Navbar extends Component {
 
-  handleItemClick = (e) => {
-    debugger
-    return e.target.innerText === "Home"? this.props.handleNavBarHome() : <></>
-  }
 
   render() {
     return (
       <Menu secondary>
         <Menu.Item
         name='home'
-        onClick={this.handleItemClick}
+        as={Link}
+        to='/choosestocks'
         />
         <Menu.Item
           name='messages'

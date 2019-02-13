@@ -17,3 +17,6 @@ buy actual stock
 
 
 to do: only post uniq stocks
+
+bugs:
+-when stock has not been around for a year then there is nothing to be loaded

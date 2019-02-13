@@ -19,12 +19,7 @@ export default class App extends React.Component {
     user:null,
     chosenStockUrls:[],
     navBarHidden: true,
-    stocksUserSees:[]
-  }
-
-  handleNavBarHome = () => {
-    debugger
-    // props.history.push('/choosestocks')
+    chosenStockUrlsClone:[]
   }
 
   findUser = (username) => {
@@ -36,9 +31,14 @@ export default class App extends React.Component {
     })
     }
 
-    changeAccountAndUserState = (account, username) => {
+  changeAccountAndUserState = (account, username) => {
+    if (account <= 0){
+      Window.alert("Your Bank Account is 0 so you will receive $10 reset")
+      this.setState({account:10, username:username})
+    }else{
       this.setState({account:account, username:username})
     }
+  }
 
   navBarHiddenChange = () => {
     this.setState({navBarHidden:!this.state.navBarHidden})
@@ -166,7 +166,6 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 
     this.setState({allstocksbeforeportfolio:uniqArrayUsedForSettingState},()=>{//we post accurate stocks backend with iex stocks
           if (uniqArray.length > 0){
-
             uniqArray.forEach(stock=>{
             fetch('http://localhost:3000/api/v1/stocks', {
           method: 'POST',
@@ -247,13 +246,14 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
   pushStockIntoChosenStockUrlsState = (symbol) => {
      const selectedStock = this.state.infocusmerged.find(stock => stock.symbol === symbol)
 
-     this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]})
+     this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]},() => {
+       this.setState({chosenStockUrlsClone:[...this.state.chosenStockUrls, selectedStock]})
+     })
      // const updatedArray = this.state.infocusmerged.map(stock => stock.symbol === id ? selectedStock : stock )
      // this.setState({chosenStockUrls:[...this.state.chosenStockUrls, selectedStock]})
  }
 
  clearChosenStockUrlsState = () => {
-   debugger
    this.setState({chosenStockUrls:[]})
  }
 
@@ -278,7 +278,17 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
         {(this.state.navBarHidden) ? null : <Navbar handleNavBarHome={this.handleNavBarHome} account={this.state.account}/>}
         <Route exact path='/choosestocks' render={props => <Stocks {...props}  chosenStockUrlsLength={this.state.chosenStockUrls.length} chosenStockUrls={this.state.chosenStockUrls} pushStockIntoChosenStockUrlsState={this.pushStockIntoChosenStockUrlsState} infocus={this.state.infocusmerged} />}
         />
-        <Route exact path='/Chosenstockchart1' render={props => <Chosenstockchart1 handleAccount={this.handleAccount} clearChosenStockUrlsState={this.clearChosenStockUrlsState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
+        <Route exact path='/Chosenstockchart1'
+          render={props =>
+            <Chosenstockchart1
+            handleAccount={this.handleAccount} clearChosenStockUrlsState={this.clearChosenStockUrlsState}
+            {...props}
+            user={this.state.user}
+            chosenStockUrls={this.state.chosenStockUrls}
+            account={this.state.account}
+            chosenStockUrlsClone={this.state.chosenStockUrlsClone[0]}
+            />
+          }
         />
         <Route exact path='/portfolio' render={props => <Portfolio handleAccount={this.handleAccount} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
         />

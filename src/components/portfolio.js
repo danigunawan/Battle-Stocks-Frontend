@@ -12,7 +12,6 @@ export default class portfolio extends React.Component {
     .then(r=>{
       let filteredUser = r.filter(portfoliostock=> portfoliostock.user_id === this.props.user.id)
       let filteredUserWins = filteredUser.filter(stock=>stock.win)
-      debugger
       this.setState({filteredUserWins})
       })
     }

@@ -1,5 +1,6 @@
 import React from 'react'
 import Stock from './Stock'
+import { Grid, Image } from 'semantic-ui-react'
 
 export default class Stocks extends React.Component {
 
@@ -42,9 +43,63 @@ export default class Stocks extends React.Component {
     )
   }
 }
-// Chosenstockchart1
 
-// onClick={this.handleState}
+
+
+
+
+// import { Grid, Image } from 'semantic-ui-react'
+//
+// const GridExampleColumnCount = () => (
+//   <Grid>
+//     <Grid.Row columns={3}>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//     </Grid.Row>
+//
+//     <Grid.Row columns={4}>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//     </Grid.Row>
+//
+//     <Grid.Row columns={5}>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//       <Grid.Column>
+//         <Image src='/images/wireframe/image.png' />
+//       </Grid.Column>
+//     </Grid.Row>
+//   </Grid>
+// )
+
+
 
 // <button onClick={() => hashHistory.push(`/mySite/accountview?id=${account.AccountName}`)}></button>
 // <button><Link to={'/'}>Let's begin</Link></button>
