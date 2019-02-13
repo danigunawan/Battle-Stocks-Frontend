@@ -2,24 +2,25 @@ import React, { Component } from 'react'
 import { Input, Menu, Label } from 'semantic-ui-react'
 
 export default class Navbar extends Component {
-  state = { activeItem: 'home' }
 
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+  handleItemClick = (e) => {
+    debugger
+    return e.target.innerText === "Home"? this.props.handleNavBarHome() : <></>
+  }
 
   render() {
-    const { activeItem } = this.state
-
     return (
       <Menu secondary>
-        <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
+        <Menu.Item
+        name='home'
+        onClick={this.handleItemClick}
+        />
         <Menu.Item
           name='messages'
-          active={activeItem === 'messages'}
           onClick={this.handleItemClick}
         />
         <Menu.Item
           name='friends'
-          active={activeItem === 'friends'}
           onClick={this.handleItemClick}
         />
         <Label>
@@ -29,7 +30,6 @@ export default class Navbar extends Component {
         <Menu.Menu position='right'>
           <Menu.Item
             name='logout'
-            active={activeItem === 'logout'}
             onClick={this.handleItemClick}
           />
         </Menu.Menu>

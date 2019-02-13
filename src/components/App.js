@@ -22,6 +22,11 @@ export default class App extends React.Component {
     stocksUserSees:[]
   }
 
+  handleNavBarHome = () => {
+    debugger
+    // props.history.push('/choosestocks')
+  }
+
   findUser = (username) => {
     fetch('http://localhost:3000/api/v1/users')
     .then(r=>r.json())
@@ -265,18 +270,17 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 //   }
 
   render(){//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    console.log(this.state.chosenStockUrls)
     return(
       <Router>
         <div>
         <Route exact path='/' render={props => <Login handleStocksViewedAfterLogin={this.handleStocksViewedAfterLogin} findUser={this.findUser} {...props} user={this.state.user} changeAccountAndUserState={this.changeAccountAndUserState} navBarHiddenChange={this.navBarHiddenChange}/>}
         />
-        {(this.state.navBarHidden) ? null : <Navbar account={this.state.account}/>}
+        {(this.state.navBarHidden) ? null : <Navbar handleNavBarHome={this.handleNavBarHome} account={this.state.account}/>}
         <Route exact path='/choosestocks' render={props => <Stocks {...props}  chosenStockUrlsLength={this.state.chosenStockUrls.length} chosenStockUrls={this.state.chosenStockUrls} pushStockIntoChosenStockUrlsState={this.pushStockIntoChosenStockUrlsState} infocus={this.state.infocusmerged} />}
         />
         <Route exact path='/Chosenstockchart1' render={props => <Chosenstockchart1 handleAccount={this.handleAccount} clearChosenStockUrlsState={this.clearChosenStockUrlsState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
         />
-        <Route exact path='/portfolio' render={props => <Portfolio handleAccount={this.handleAccount} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState}{...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
+        <Route exact path='/portfolio' render={props => <Portfolio handleAccount={this.handleAccount} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
         />
         </div>
       </Router>

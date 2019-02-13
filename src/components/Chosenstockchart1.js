@@ -21,7 +21,8 @@ export default class Chosenstockchart1 extends React.Component{
     guessedIncreaseDecreaseRight: false,
     guessedPriceRight: false,
     bet:null,
-    difference:null
+    difference:null,
+    chosenStockUrls:[]
     }
 
   handleDecrease = () => {
@@ -61,28 +62,15 @@ export default class Chosenstockchart1 extends React.Component{
     return this.state.guessedPriceRight && this.state.guessedIncreaseDecreaseRight ? this.setState({won:!this.state.won}, () => this.handleWin()) : this.state.guessedPriceRight || this.state.guessedIncreaseDecreaseRight? this.setState({halflost:!this.state.halflost}, () => this.handleHalfLost()) : this.setState({completelylost: !this.state.completelylost}, () => this.handleCompletelyLost())
   }
 
-  handleWin = () => {
+  handleWin = async () => {
+    this.setState({chosenStockUrls: this.props.chosenStockUrls[0]})
     let accountChange = this.props.account + (this.state.bet * 2)
-    this.props.handleAccount(accountChange)
-    fetch('http://localhost:3000/api/v1/stocks')
+
+    await fetch('http://localhost:3000/api/v1/stocks')
     .then(r=>r.json())
     .then(r=>{
-
     const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrls[0].symbol)
 
-    debugger
-    fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        bank_account: accountChange
-      })
-    })//fetch end
-    .then(r=>{
-      debugger
     fetch('http://localhost:3000/api/v1/portfoliostocks', {
       method: 'POST',
       headers: {
@@ -95,68 +83,113 @@ export default class Chosenstockchart1 extends React.Component{
         "win":true
       })
     })//fetch end
-  })//promise end
-  debugger
-    this.props.clearChosenStockUrlsState()
-  }) //promise end
-}//handle win end
-//////////////////////////////////////half lost////////////////////////////////////////////////////////////////
-  handleHalfLost = () => {
-    let accountChange = this.props.account + (this.state.bet / 2)
-    this.props.handleAccount(accountChange)
-      fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          bank_account: accountChange,
-        })
-      })
-      fetch('http://localhost:3000/api/v1/portfoliostocks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          "user_id": this.props.user.id,
-          "stock_id": this.props.chosenStockUrls[0].id
-        })
-      })
-  }//handlehalflost/////////////////////////////////////////////////////////////////////////////////
 
-  handleCompletelyLost = () =>{
-    let accountChange = this.props.account - 500 - this.state.bet
-    this.props.handleAccount(accountChange)
-    let adjustment = this.props.account - 500
+    })
 
-    fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        bank_account: adjustment
-
+        bank_account: accountChange
       })
     })//fetch end
     .then(r=>{
-      return adjustment
+      this.props.handleAccount(accountChange)
+      // this.props.clearChosenStockUrlsState()
+    })
+}//handle win end
+//////////////////////////////////////half lost////////////////////////////////////////////////////////////////
+  handleHalfLost = async () => {
+    this.setState({chosenStockUrls: this.props.chosenStockUrls[0]})
+    let accountChange = this.props.account + (this.state.bet / 2)
+
+    await fetch('http://localhost:3000/api/v1/stocks')
+    .then(r=>r.json())
+    .then(r=>{
+    const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrls[0].symbol)
+
+    fetch('http://localhost:3000/api/v1/portfoliostocks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "user_id": this.props.user.id,
+        "stock_id": selectedStockId.id,
+        "win":true
+      })
+    })//fetch end
+
+    })
+
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        bank_account: accountChange
+      })
+    })//fetch end
+    .then(r=>{
+      this.props.handleAccount(accountChange)
+      // this.props.clearChosenStockUrlsState()
+    })
+  }//handlehalflost/////////////////////////////////////////////////////////////////////////////////
+
+  handleCompletelyLost = async () =>{
+    this.setState({chosenStockUrls: this.props.chosenStockUrls[0]})
+    let accountChange = (this.props.account + this.state.bet - 500)
+
+    await fetch('http://localhost:3000/api/v1/stocks')
+    .then(r=>r.json())
+    .then(r=>{
+    const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrls[0].symbol)
+
+    fetch('http://localhost:3000/api/v1/portfoliostocks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "user_id": this.props.user.id,
+        "stock_id": selectedStockId.id,
+        "win":false
+      })
+    })//fetch end
+
+    })
+
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        bank_account: accountChange
+      })
+    })//fetch end
+    .then(r=>{
+      this.props.handleAccount(accountChange)
+      // this.props.clearChosenStockUrlsState()
     })
   }//complete lost////////////////////////////////////////////
 
   render(){
-    console.log(this.props)
     return (
       <div>
             {this.state.won?<h1>Winner!<br /> Price Difference: ${this.state.difference.toFixed(2)} <br /> You doubled your bet of ${this.state.bet} to ${this.state.bet * 2} <br /> New Balance: ${this.props.account}</h1> : this.state.halflost? <h1>You got half your bet of ${this.state.bet} added to your account!<br /> Your Winnings: ${this.state.bet / 2}<br /> New Balance: ${this.props.account}</h1> : this.state.completelylost? <h1>You lost this round, onto the next!<br />Loss: -$500 <br /> Bet: -${this.state.bet}! <br /> New Balance: ${this.props.account}</h1> :
             <div>
-            <h1>{this.props.chosenStockUrls[0].name}</h1>
-            <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice}</h3>
-            {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice}</h3> : <></>}
+            <h1>{this.props.chosenStockUrls[0].name || this.state.chosenStockUrls[0].name}</h1>
+            <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice || this.state.chosenStockUrls[0].oneYrPrice}</h3>
+            {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice || this.state.chosenStockUrls[0].openPrice}</h3> : <></>}
                 <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
                   <VerticalGridLines />
                   <HorizontalGridLines />
@@ -164,8 +197,8 @@ export default class Chosenstockchart1 extends React.Component{
                   <YAxis />
                   <VerticalBarSeries
                     data={[
-                      {x: 'ONE YEAR AGO', y: this.props.chosenStockUrls[0].oneYrPrice},
-                      this.state.today? {x: 'TODAY', y: this.props.chosenStockUrls[0].openPrice} : {x: 'TODAY', y: 0}
+                      {x: 'ONE YEAR AGO', y: this.props.chosenStockUrls[0].oneYrPrice || this.state.chosenStockUrls[0].oneYrPrice},
+                      this.state.today? {x: 'TODAY', y: this.props.chosenStockUrls[0].openPrice ||  this.state.chosenStockUrls[0].openPrice} : {x: 'TODAY', y: 0}
                     ]}
                   />
                 </XYPlot>
@@ -197,9 +230,9 @@ export default class Chosenstockchart1 extends React.Component{
               <div>
               {this.state.won === false && this.state.halflost === false && this.state.completelylost === false? <></> :
               <div>
-              <h1>{this.props.chosenStockUrls[0].name}</h1>
-              <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice}</h3>
-              {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice}</h3> : <></>}
+              <h1>{this.props.chosenStockUrls[0].name || this.state.chosenStockUrls[0].name}</h1>
+              <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrls[0].oneYrPrice || this.state.chosenStockUrls[0].oneYrPrice}</h3>
+              {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrls[0].openPrice || this.state.chosenStockUrls[0].openPrice}</h3> : <></>}
                   <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
                     <VerticalGridLines />
                     <HorizontalGridLines />
@@ -207,8 +240,8 @@ export default class Chosenstockchart1 extends React.Component{
                     <YAxis />
                     <VerticalBarSeries
                       data={[
-                        {x: 'ONE YEAR AGO', y: this.props.chosenStockUrls[0].oneYrPrice},
-                        this.state.today? {x: 'TODAY', y: this.props.chosenStockUrls[0].openPrice} : {x: 'TODAY', y: 0}
+                        {x: 'ONE YEAR AGO', y: this.props.chosenStockUrls[0].oneYrPrice || this.state.chosenStockUrls[0].oneYrPrice},
+                        this.state.today? {x: 'TODAY', y: this.props.chosenStockUrls[0].openPrice || this.state.chosenStockUrls[0].openPrice} : {x: 'TODAY', y: 0}
                       ]}
                     />
                   </XYPlot>
