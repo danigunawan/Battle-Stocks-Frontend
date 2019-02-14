@@ -7,6 +7,8 @@ import {
   HorizontalGridLines,
   VerticalBarSeries
 } from 'react-vis';
+import { Label, Divider, Container, Button, Icon, Grid, Image, Form } from 'semantic-ui-react'
+
 
 export default class Chosenstockchart1 extends React.Component{
   state = {
@@ -172,54 +174,122 @@ export default class Chosenstockchart1 extends React.Component{
   render(){
     return (
       <div>
-            {this.state.won?<h1>Winner!<br /> Price Difference: ${this.state.difference.toFixed(2)} <br /> You doubled your bet of ${this.state.bet} to ${this.state.bet * 2} <br /> New Balance: ${this.props.account}</h1> : this.state.halflost? <h1>You got half your bet of ${this.state.bet} added to your account!<br /> Your Winnings: ${this.state.bet / 2}<br /> New Balance: ${this.props.account}</h1> : this.state.completelylost? <h1>You lost this round, onto the next!<br />Loss: -$500 <br /> Bet: -${this.state.bet}! <br /> New Balance: ${this.props.account}</h1> :
+      <Grid>
+        <Grid.Row columns={3}>
+        <Grid.Column>
+        </Grid.Column>
+          <Grid.Column>
+          <Container textAlign='center'>
+          {this.state.won?
+            <h1>Winner!<br />
+            Price Difference: ${this.state.difference.toFixed(2)} <br />
+            You doubled your bet of ${this.state.bet} to ${this.state.bet * 2} <br />
+            New Balance: ${this.props.account}</h1>
+            :
+            this.state.halflost?
+              <h1>You got half your bet of ${this.state.bet} added to your account!<br />
+              Your Winnings: ${this.state.bet / 2}<br /> New Balance: ${this.props.account}</h1>
+            :
+            this.state.completelylost?
+              <h1>You lost this round, onto the next!<br />Loss: -$500 <br />
+              Bet: -${this.state.bet}! <br />
+              New Balance: ${this.props.account}</h1>
+            :
             <div>
             <h1>{this.props.chosenStockUrlsClone.name || this.props.chosenStockUrlsClone.name}</h1>
             <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice}</h3>
-            {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrlsClone.openPrice || this.props.chosenStockUrlsClone.openPrice}</h3> : <></>}
-                <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
-                  <VerticalGridLines />
-                  <HorizontalGridLines />
-                  <XAxis tickLabelAngle={-45} />
-                  <YAxis />
-                  <VerticalBarSeries
-                    data={[
-                      {x: 'ONE YEAR AGO', y: this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice},
-                      this.state.today? {x: 'TODAY', y: this.props.chosenStockUrlsClone.openPrice ||  this.props.chosenStockUrlsClone.openPrice} : {x: 'TODAY', y: 0}
-                    ]}
-                  />
-                </XYPlot>
+
+            {this.state.today?
+              <h3>Price Per Share Today: ${this.props.chosenStockUrlsClone.openPrice || this.props.chosenStockUrlsClone.openPrice}</h3>
+            :
+              <></>
+            }
+            <Container textAlign='center'>
+              <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
+                <VerticalGridLines />
+                <HorizontalGridLines />
+                <XAxis tickLabelAngle={-45} />
+                <YAxis />
+                <VerticalBarSeries
+                  data={[
+                    {x: 'ONE YEAR AGO', y: this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice},
+                    this.state.today? {x: 'TODAY', y: this.props.chosenStockUrlsClone.openPrice } : {x: 'TODAY', y: 0}
+                  ]}
+                />
+              </XYPlot>
+              </Container>
               <br /><br />
-                  <div>
-                    {this.state.increase? <h4>Your Choice: Increased</h4> : this.state.decrease? <h4>Your Choice: Decreased</h4> :
-                      <div>Price increase or decrease in the past year?<br /><button onClick={this.handleIncrease}>Increase?</button><button onClick={this.handleDecrease}>Decrease?</button></div>
-                    }
-                    <form onSubmit={this.handleSubmit}>
-                    <br /><label>Today's Price</label><br />
-                      <input
-                        type="integer"
-                        placeholder="Today's Price?"
-                        onChange={event => {this.setState({input: event.target.value})}}
+
+                <div>
+                {this.state.increase?
+                    <h4>Your Choice: Increased</h4>
+                  :
+                    this.state.decrease?
+                      <h4>Your Choice: Decreased</h4>
+                  :
+                      <div>
+                      <Label size="large" color='red'>
+                      Price increase or decrease in the past year?<br />
+                      </Label>
+                      <br />
+                      <Button
+                        animated='fade'
+                        onClick={this.handleIncrease}
+                        basic size="big"
+                        color="black"
+                      >
+                        <Button.Content visible>
+                          Increase?
+                        </Button.Content>
+                        <Button.Content hidden>
+                        <Icon size="large" name='earlybirds' />
+                        </Button.Content>
+                      </Button>
+                      <Button
+                        animated='fade'
+                        onClick={this.handleDecrease}
+                        basic size="big"
+                        color="black"
+                      >
+                        <Button.Content visible>
+                          Decrease?
+                        </Button.Content>
+                        <Button.Content hidden>
+                        <Icon size="large" name='earlybirds' />
+                        </Button.Content>
+                      </Button>
+                      </div>
+                }
+                    <Form size="large" onSubmit={this.handleSubmit}>
+                    <Form.Group widths='equal'>
+                    <Form.Input
+                      label="Today's Price?"
+                      color='red'
+                      placeholder="Today's Price?"
+                      onChange={event => {this.setState({input: event.target.value})}}
                       />
-                      <br /><label>Bet</label><br />
-                      <input
-                        type="integer"
-                        placeholder="Bet?"
+                      <Form.Input
+                        label="Bet?"
+                        color='red'
+                        placeholder="Amount?"
                         onChange={event => {this.setState({bet: event.target.value})}}
-                      />
-                      <br />{this.state.input === ''? <></> : <button type="submit">Submit</button>}
-                    </form>
+                        />
+                    </Form.Group>
+                      {this.state.input === ''? <></> : <Button type='submit'>Submit</Button>}
+                    </Form>
                   </div>
-                <br />
+
                 </div>
               }
 
               <div>
-              {this.state.won === false && this.state.halflost === false && this.state.completelylost === false? <></> :
+              {this.state.won === false && this.state.halflost === false &&     this.state.completelylost === false?
+                <></>
+              :
               <div>
-              <h1>{this.props.chosenStockUrlsClone.name || this.props.chosenStockUrlsClone.name}</h1>
-              <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice}</h3>
-              {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrlsClone.openPrice || this.props.chosenStockUrlsClone.openPrice}</h3> : <></>}
+              <h1>{this.props.chosenStockUrlsClone.name}</h1>
+              <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrlsClone.oneYrPrice}</h3>
+              {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrlsClone.openPrice}</h3> : <></>}
                   <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
                     <VerticalGridLines />
                     <HorizontalGridLines />
@@ -227,8 +297,8 @@ export default class Chosenstockchart1 extends React.Component{
                     <YAxis />
                     <VerticalBarSeries
                       data={[
-                        {x: 'ONE YEAR AGO', y: this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice},
-                        this.state.today? {x: 'TODAY', y: this.props.chosenStockUrlsClone.openPrice || this.props.chosenStockUrlsClone.openPrice} : {x: 'TODAY', y: 0}
+                        {x: 'ONE YEAR AGO', y: this.props.chosenStockUrlsClone.oneYrPrice},
+                        this.state.today? {x: 'TODAY', y: this.props.chosenStockUrlsClone.openPrice} : {x: 'TODAY', y: 0}
                       ]}
                     />
                   </XYPlot>
@@ -236,8 +306,48 @@ export default class Chosenstockchart1 extends React.Component{
                 </div>
               }
               </div>
-              {this.state.completelylost || this.state.won || this.state.halflost? <button onClick={()=>{this.props.history.push('/portfolio')}}>Head to your portfolio</button> : this.state.difference? <button onClick={()=>{this.props.history.push('/choosestocks')}}>Home</button> : <></>}
-      </div>
+              {this.state.completelylost || this.state.won || this.state.halflost?
+                  <button onClick={()=>{this.props.history.push('/portfolio')}}>
+                  Head to your portfolio
+                  </button>
+                :
+                this.state.difference?
+                <button onClick={()=>{this.props.history.push('/choosestocks')}}>
+                Home
+                </button>
+                :
+                <></>
+              }
+              </Container>
+              </Grid.Column>
+                </Grid.Row>
+                </Grid>
+              </div>
     )
   }//render end
 }//class end
+
+
+
+
+
+
+
+
+
+
+
+// {/*onChange={event => {this.setState({input: event.target.value})}}*/}
+
+
+// <input
+// type="integer"
+// placeholder="Bet?"
+// onChange={event => {this.setState({bet: event.target.value})}}
+// />
+
+// <Form.Field
+// label="Bet?"
+// color='red'
+// size="large"
+// />

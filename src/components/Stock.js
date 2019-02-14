@@ -1,31 +1,57 @@
 import React from 'react'
+import { Label, Container, Button, Icon, Grid, Image } from 'semantic-ui-react'
 
 export default class Stock extends React.Component {
+
+  state = {
+    colorArray:["red", "orange", "yellow", "green", "blue"]
+  }
 
   handleClick = () => {
     this.props.pushStockIntoChosenStockUrlsState(this.props.symbol)
   }
 
+  randomItem = () => {
+    let color = this.state.colorArray[Math.floor(Math.random()*this.state.colorArray.length)];
+    return color.toString()
+  }
+
   render(){
     return (
-      <div>
-      {this.props.chosenStockUrlsLength >= 1?
-        <div>
-        <br /> Your Chosen Stock:<br /><br />
-        {this.props.name}<br />
-        {this.props.symbol}<br />
-        <img alt="" width="100" height="120" src={this.props.logo} /><br /><br />
-      </div>
-      :
-      <div>
-        {this.props.name}<br />
-        {this.props.symbol}<br />
-        <img alt="" src={this.props.logo} width="100" height="120"  /><br />
-        <button onClick={this.handleClick}>Pick Stock</button>
-      </div>
-    }
-    </div>
+      <Grid.Column>
+        {this.props.chosenStockUrlsLength >= 1?
+          <Container textAlign='center'>
+          <br /><h3> Your Chosen Stock:</h3>
+          <br /><br /><br /><br /><br /><br />
+          <Label size="massive" as='a' color={this.randomItem()} tag>{this.props.name}</Label><br />
+          <Image alt="" width="100" height="120" src={this.props.symbol} /><br /><br />
+          </Container>
+
+        :
+
+          <div>
+          <Container textAlign='center'><h3>{this.props.name}</h3></Container>
+          <br />
+          <Container textAlign='center'>
+            <Button
+              animated='fade'
+              onClick={this.handleClick}
+              basic size="big"
+              color={this.randomItem()}
+            >
+              <Button.Content visible>
+                {this.props.symbol}
+              </Button.Content>
+              <Button.Content hidden>
+              <Icon size="large" name='earlybirds' />
+              </Button.Content>
+            </Button>
+          </Container>
+          <br />
+          </div>
+        }
+      </Grid.Column>
     )
   }
+
 }
-// onerror="this.src='https://st2.depositphotos.com/7760196/10625/i/950/depositphotos_106255076-stock-photo-archimedes-eureka-swimming-bath-cartoon.jpg'"

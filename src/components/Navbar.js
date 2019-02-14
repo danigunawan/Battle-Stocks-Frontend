@@ -1,40 +1,30 @@
 import React, { Component } from 'react'
-import { Input, Menu, Label } from 'semantic-ui-react'
+import { Grid, Container, Header, Icon, Input, Menu, Label, Segment } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-
 export default class Navbar extends Component {
 
 
   render() {
+    // <Container textAlign='right'><Header as='h2' inverted color='blue'>
+    // <Icon name='earlybirds' />
+    // <Header.Content>Battle Stocks</Header.Content>
+    // </Header></Container>
     return (
-      <Menu secondary>
-        <Menu.Item
-        name='home'
-        as={Link}
-        to='/choosestocks'
-        />
-        <Menu.Item
-          name='messages'
-          onClick={this.handleItemClick}
-        />
-        <Menu.Item
-          name='friends'
-          onClick={this.handleItemClick}
-        />
-        <Label>
-          Account
-          <Label.Detail>${this.props.account}</Label.Detail>
-        </Label>
-        <Menu.Menu position='right'>
-          <Menu.Item
-            name='logout'
-            onClick={this.handleItemClick}
-          />
-        </Menu.Menu>
-      </Menu>
+      <Segment clearing>
+        <Header as='h3' as={Link} to='/choosestocks'  floated='left'>
+          Home
+        </Header>
+        <Header as='h3' as={Link} to='/portfolio'  floated='left'>
+        Portfolio
+        </Header>
+        <Header as='h3' floated='left'>
+        ${this.props.account}
+        </Header>
+        <Header as='h3' inverted color='blue' floated='right'>
+        <Icon name='earlybirds' />
+        <Header.Content>Battle Stocks</Header.Content>
+        </Header>
+        </Segment>
     )
   }
 }
-// <Menu.Item>
-//   <Input icon='search' placeholder='Search...' />
-// </Menu.Item>

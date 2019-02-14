@@ -1,17 +1,32 @@
 import React from 'react'
 import Stock from './Stock'
-import { Grid, Image } from 'semantic-ui-react'
+import { Icon, Divider, Segment, Container, Grid, Image, Button } from 'semantic-ui-react'
 
 export default class Stocks extends React.Component {
 
   render(){
     return (
       <div>
-          {this.props.chosenStockUrlsLength >= 1? <h1>Given price per share of your chosen stocks ONE YEAR AGO: <br/>1) Did they Increase/Decrease?<br />2)Current Price?<br />------------------------------------<br />Reward:<br /> Both currect? Double Account. <br /> Incorrect? -$500 and -Bet.<br /> 1/2? Receive half your bet.</h1>
+          {this.props.chosenStockUrlsLength >= 1?
+            <Segment>
+              <Grid columns={2} relaxed='very'>
+                <Grid.Column>
+                  <Container textAlign='center'><h3>Given price per share of your chosen stock ONE YEAR AGO: <br/>1) Did it Increase/Decrease?<br />2)Current Price?</h3></Container>
+                </Grid.Column>
+                <Grid.Column>
+                  <Container textAlign='center'><h3>Reward:<br /> Both currect? Double Account. <br /> Incorrect? -$500 and -Bet.<br /> 1/2? Receive half your bet.</h3></Container>
+                </Grid.Column>
+              </Grid>
+              <Divider vertical>And</Divider>
+            </Segment>
           :
-          <h1>The name of the game is BattleStocks!!!!!<br />Choose your stock:</h1>}
+            <Container textAlign='center'><h1>The name of the game is BattleStocks!!!!!<br />Choose your stock:<br /><br /></h1></Container>
+          }
+
+          <Grid>
             {this.props.chosenStockUrlsLength >= 1 ?
-              this.props.chosenStockUrls.map(stock =>{
+              <Grid.Row columns={1}>
+              {this.props.chosenStockUrls.map(stock =>{
               return (
                 <Stock
                 pushStockIntoChosenStockUrlsState={this.props.pushStockIntoChosenStockUrlsState}
@@ -23,9 +38,11 @@ export default class Stocks extends React.Component {
                 chosenStockUrlsLength={this.props.chosenStockUrlsLength}
                 />
               )
-            })
+            })}
+            </Grid.Row>
             :
-        this.props.infocus.map(stock =>{
+        <Grid.Row columns={5}>
+        {this.props.infocus.map(stock =>{
         return (
           <Stock
           pushStockIntoChosenStockUrlsState={this.props.pushStockIntoChosenStockUrlsState} id={stock.symbol}
@@ -36,68 +53,41 @@ export default class Stocks extends React.Component {
           chosenStockUrlsLength={this.props.chosenStockUrlsLength}
           />
         )
-      })
+      })}
+      </Grid.Row>
         }
-        {this.props.chosenStockUrlsLength >= 1? <button onClick={() => this.props.history.push('/Chosenstockchart1')}>Let's Gamble</button> : <></>}
-      </div>
+        </Grid>
+
+        {this.props.chosenStockUrlsLength >= 1?
+
+          <Container textAlign='center'>
+          <Button
+            animated='fade'
+            onClick={() => this.props.history.push('/Chosenstockchart1')}
+            basic size="big"
+            color="black"
+          >
+          <Button.Content visible>
+              Let's Gamble
+          </Button.Content>
+          <Button.Content hidden>
+          <Icon size="large" name='earlybirds' />
+          </Button.Content>
+          </Button>
+          </Container>
+
+            :
+
+          <></>
+        }
+
+    </div>
     )
   }
 }
 
 
 
-
-
-// import { Grid, Image } from 'semantic-ui-react'
-//
-// const GridExampleColumnCount = () => (
-//   <Grid>
-//     <Grid.Row columns={3}>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//     </Grid.Row>
-//
-//     <Grid.Row columns={4}>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//     </Grid.Row>
-//
-//     <Grid.Row columns={5}>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//       <Grid.Column>
-//         <Image src='/images/wireframe/image.png' />
-//       </Grid.Column>
-//     </Grid.Row>
-//   </Grid>
-// )
 
 
 

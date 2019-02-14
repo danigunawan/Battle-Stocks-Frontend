@@ -1,9 +1,16 @@
 import React from 'react'
+import { Icon, Divider, Segment, Container, Grid, Image, Button } from 'semantic-ui-react'
 
 export default class portfolio extends React.Component {
 
   state = {
-    filteredUserWins:[]
+    filteredUserWins:[],
+    colorArray:["red", "orange", "yellow", "green", "blue"]
+  }
+
+  randomItem = () => {
+    let color = this.state.colorArray[Math.floor(Math.random()*this.state.colorArray.length)];
+    return color.toString()
   }
 
   async componentDidMount(){
@@ -21,16 +28,35 @@ export default class portfolio extends React.Component {
     return (
       <div>
       <h1>Portfolio</h1>
+      <Container textAlign='center'>
+      <Grid>
+      <Grid.Row columns={4}>
        {this.state.filteredUserWins.map(userstocks => {
             return (
-            <div>
+            <Grid.Column>
             <h2>{userstocks.stock.name}</h2>
-            <h2>{userstocks.stock.symbol}</h2>
+            <Button
+              animated='fade'
+              onClick={this.handleClick}
+              basic size="big"
+              color={this.randomItem()}
+            >
+              <Button.Content visible>
+                {userstocks.stock.symbol}
+              </Button.Content>
+              <Button.Content hidden>
+              <Icon size="large" name='earlybirds' />
+              </Button.Content>
+            </Button>
+
             <h2>{userstocks.stock.oneYrPrice}</h2>
             <h2>{userstocks.stock.openPrice}</h2>
-            </div>
+            </Grid.Column>
           )
         })}
+        </Grid.Row>
+        </Grid>
+        </Container>
       </div>
     )
   }
