@@ -7,8 +7,8 @@ import {
   HorizontalGridLines,
   VerticalBarSeries
 } from 'react-vis';
-import { Label, Divider, Container, Button, Icon, Grid, Image, Form } from 'semantic-ui-react'
-
+import { Label, Divider, Container, Button, Icon, Grid, Image, Form, List } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
 
 export default class Chosenstockchart1 extends React.Component{
   state = {
@@ -24,6 +24,11 @@ export default class Chosenstockchart1 extends React.Component{
     guessedPriceRight: false,
     bet:null,
     difference:null,
+    ceo:[],
+    description:null,
+    exchange:null,
+    industry: null,
+    website: null
     }
 
   handleDecrease = () => {
@@ -101,6 +106,7 @@ export default class Chosenstockchart1 extends React.Component{
     await fetch('http://localhost:3000/api/v1/stocks')
     .then(r=>r.json())
     .then(r=>{
+
       const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrlsClone.symbol)
 
       fetch('http://localhost:3000/api/v1/portfoliostocks', {
@@ -110,13 +116,16 @@ export default class Chosenstockchart1 extends React.Component{
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          "user_id": this.props.user.id,
-          "stock_id": selectedStockId.id,
-          "win":true
+          user_id: this.props.user.id,
+          stock_id: selectedStockId.id,
+          win:true
         })
       })//fetch end
+      debugger
+      this.props.handleStocksViewedAfterLogin()
     })
-    this.patchBankAccount()
+
+    this.patchBankAccount(accountChange)
   }//handlewin end//////////////////////////////////////////////////////////
 
   handleHalfLost = async () => {
@@ -127,7 +136,6 @@ export default class Chosenstockchart1 extends React.Component{
     .then(r=>r.json())
     .then(r=>{
     const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrlsClone.symbol)
-
     fetch('http://localhost:3000/api/v1/portfoliostocks', {
       method: 'POST',
       headers: {
@@ -140,10 +148,11 @@ export default class Chosenstockchart1 extends React.Component{
         "win":true
       })
     })//fetch end
-
-    })
-    this.patchBankAccount(accountChange)
-  }//handlehalflost/////////////////////////////////////////////////////////////////////////////////
+        })
+        this.patchBankAccount(accountChange)
+        debugger
+        this.props.handleStocksViewedAfterLogin()
+      }//handle half lost
 
   handleCompletelyLost = async () =>{
     this.props.clearChosenStockUrlsState()
@@ -169,17 +178,66 @@ export default class Chosenstockchart1 extends React.Component{
 
     })
     this.patchBankAccount(accountChange)
+    this.props.handleStocksViewedAfterLogin()
   }//complete lost////////////////////////////////////////////
+
+  async componentDidMount() {
+    await fetch (`https://api.iextrading.com/1.0/stock/${this.props.chosenStockUrls[0].symbol}/company`)
+    .then(r=>r.json())
+    .then(r=>{
+      this.setState({
+        ceo:r.CEO,
+        description:r.description,
+        exchange:r.exchange,
+        industry: r.industry,
+        website: r.website
+      })
+    })
+  }//end of handleCompanyInfo////////////////
 
   render(){
     return (
       <div>
-      <Grid>
-        <Grid.Row columns={3}>
-        <Grid.Column>
-        </Grid.Column>
+      <Grid textAlign='center' verticalAlign='middle' columns={3} centered>
+          <Grid.Row stretched>
           <Grid.Column>
-          <Container textAlign='center'>
+      {this.state.completelylost || this.state.won || this.state.halflost? <></> :
+        <div>
+        <List animated size='massive'>
+
+        <h1><Icon name='chart line' /> Stock Information</h1>
+
+          <List.Item>
+          <List.Content>
+          <List.Header>{this.state.ceo}</List.Header>
+          </List.Content>
+          </List.Item>
+          <br /><br />
+          <List.Item>
+          <List.Content>
+          <List.Header>{this.state.description}</List.Header>
+          </List.Content>
+          </List.Item>
+          <br /><br />
+          <List.Item>
+          <List.Content>
+          <List.Header>{this.state.industry}</List.Header>
+          </List.Content>
+          </List.Item>
+          <br /><br />
+          <List.Item>
+          <List.Content>
+          <List.Header>{this.state.website}</List.Header>
+          </List.Content>
+          </List.Item>
+          </List>
+          </div>
+        }
+        </Grid.Column>
+
+
+          <Grid.Column>
+          <Container textAlign='center' verticalAlign='middle'>
           {this.state.won?
             <h1>Winner!<br />
             Price Difference: ${this.state.difference.toFixed(2)} <br />
@@ -196,15 +254,30 @@ export default class Chosenstockchart1 extends React.Component{
               New Balance: ${this.props.account}</h1>
             :
             <div>
-            <h1>{this.props.chosenStockUrlsClone.name || this.props.chosenStockUrlsClone.name}</h1>
-            <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrlsClone.oneYrPrice || this.props.chosenStockUrlsClone.oneYrPrice}</h3>
+            <h1>{this.props.chosenStockUrlsClone.name}
+            </h1>
+
+            <h3>Price Per Share One Year Ago:
+            $ {this.props.chosenStockUrlsClone.oneYrPrice}
+            </h3>
+            </div>
+          }
 
             {this.state.today?
-              <h3>Price Per Share Today: ${this.props.chosenStockUrlsClone.openPrice || this.props.chosenStockUrlsClone.openPrice}</h3>
+              <div>
+              <h3>Price Per Share Today: ${this.props.chosenStockUrlsClone.openPrice}
+              </h3>
+              <br /><Button as={Link} to='/Available'>Stocks Available to Purchase</Button>
+              </div>
             :
               <></>
             }
-            <Container textAlign='center'>
+            </Container>
+
+
+
+            {this.state.completelylost || this.state.won || this.state.halflost? <></> :
+
               <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
                 <VerticalGridLines />
                 <HorizontalGridLines />
@@ -217,57 +290,71 @@ export default class Chosenstockchart1 extends React.Component{
                   ]}
                 />
               </XYPlot>
-              </Container>
-              <br /><br />
+            }
 
-                <div>
+            </Grid.Column>
+
+
+
+
+
+
+
+
+
+            <Grid.Column>
                 {this.state.increase?
-                    <h4>Your Choice: Increased</h4>
+                    <></>
                   :
                     this.state.decrease?
-                      <h4>Your Choice: Decreased</h4>
+                      <></>
                   :
                       <div>
-                      <Label size="large" color='red'>
+
+                      <Label size="massive" color='red'>
                       Price increase or decrease in the past year?<br />
                       </Label>
-                      <br />
+                      <br /><br /><br />
+
                       <Button
                         animated='fade'
                         onClick={this.handleIncrease}
-                        basic size="big"
+                        basic size="massive"
                         color="black"
                       >
                         <Button.Content visible>
                           Increase?
                         </Button.Content>
                         <Button.Content hidden>
-                        <Icon size="large" name='earlybirds' />
+                        <Icon size="big" name='earlybirds' />
                         </Button.Content>
                       </Button>
                       <Button
                         animated='fade'
                         onClick={this.handleDecrease}
-                        basic size="big"
+                        basic size="massive"
                         color="black"
                       >
                         <Button.Content visible>
                           Decrease?
                         </Button.Content>
                         <Button.Content hidden>
-                        <Icon size="large" name='earlybirds' />
+                        <Icon size="big" name='earlybirds' />
                         </Button.Content>
                       </Button>
                       </div>
-                }
-                    <Form size="large" onSubmit={this.handleSubmit}>
-                    <Form.Group widths='equal'>
+                    }
+                <br /> <br />
+                  {this.state.today? <></> :
+                    <Form size="big" onSubmit={this.handleSubmit}>
+                    <Form.Group>
                     <Form.Input
                       label="Today's Price?"
                       color='red'
                       placeholder="Today's Price?"
                       onChange={event => {this.setState({input: event.target.value})}}
                       />
+                      <br /><br/>
                       <Form.Input
                         label="Bet?"
                         color='red'
@@ -277,48 +364,10 @@ export default class Chosenstockchart1 extends React.Component{
                     </Form.Group>
                       {this.state.input === ''? <></> : <Button type='submit'>Submit</Button>}
                     </Form>
-                  </div>
+                  }
 
-                </div>
-              }
 
-              <div>
-              {this.state.won === false && this.state.halflost === false &&     this.state.completelylost === false?
-                <></>
-              :
-              <div>
-              <h1>{this.props.chosenStockUrlsClone.name}</h1>
-              <h3>Price Per Share One Year Ago: $ {this.props.chosenStockUrlsClone.oneYrPrice}</h3>
-              {this.state.today? <h3>Price Per Share Today: {this.props.chosenStockUrlsClone.openPrice}</h3> : <></>}
-                  <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
-                    <VerticalGridLines />
-                    <HorizontalGridLines />
-                    <XAxis tickLabelAngle={-45} />
-                    <YAxis />
-                    <VerticalBarSeries
-                      data={[
-                        {x: 'ONE YEAR AGO', y: this.props.chosenStockUrlsClone.oneYrPrice},
-                        this.state.today? {x: 'TODAY', y: this.props.chosenStockUrlsClone.openPrice} : {x: 'TODAY', y: 0}
-                      ]}
-                    />
-                  </XYPlot>
-                <br /><br />
-                </div>
-              }
-              </div>
-              {this.state.completelylost || this.state.won || this.state.halflost?
-                  <button onClick={()=>{this.props.history.push('/portfolio')}}>
-                  Head to your portfolio
-                  </button>
-                :
-                this.state.difference?
-                <button onClick={()=>{this.props.history.push('/choosestocks')}}>
-                Home
-                </button>
-                :
-                <></>
-              }
-              </Container>
+
               </Grid.Column>
                 </Grid.Row>
                 </Grid>

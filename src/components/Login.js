@@ -30,6 +30,7 @@ export default class Login extends React.Component {
         localStorage.setItem('token', r.data.jwt)
         this.props.changeAccountAndUserState(r.data.user.bank_account, r.data.user.username)
         this.props.navBarHiddenChange()
+        
         this.props.handleStocksViewedAfterLogin()
         this.props.history.push('/choosestocks')
       })

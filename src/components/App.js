@@ -3,7 +3,10 @@ import Login from './Login'
 import Navbar from './Navbar'
 import Chosenstockchart1 from './Chosenstockchart1'
 import Stocks from './Stocks'
-import Portfolio from './portfolio'
+import Available from './Available'
+import BuyStocks from './BuyStocks';
+import Portfolio from './Portfolio';
+
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, NavLink, Redirect } from "react-router-dom";
 
@@ -19,11 +22,12 @@ export default class App extends React.Component {
     user:null,
     chosenStockUrls:[],
     navBarHidden: true,
-    chosenStockUrlsClone:[]
+    chosenStockUrlsClone:[],
+    chosenStockToPurchase: null
   }
 
-  findUser = (username) => {
-    fetch('http://localhost:3000/api/v1/users')
+  findUser = async (username) => {
+    await fetch('http://localhost:3000/api/v1/users')
     .then(r=>r.json())
     .then(r=>{
       const foundUser = r.find(user => user.username === username)
@@ -52,6 +56,7 @@ export default class App extends React.Component {
     await fetch('https://api.iextrading.com/1.0/stock/market/list/infocus')
     .then(r=>r.json())
     .then(r=>{
+
       const stockMap = r.map((stock, i)=>{
         return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
       })
@@ -68,20 +73,11 @@ export default class App extends React.Component {
         })
       })
     })
-    .then(r => {
-      const symbol = this.state.infocus.map(stock=>{
-        fetch(`https://api.iextrading.com/1.0/stock/${stock.symbol}/logo`)
-        .then(r => r.json())
-        .then(r=>{
-          const logoUrl = r.url
-          this.setState(Object.assign(stock, {logo:logoUrl}))
-        })
-      })
-    })
 ///////////////////////////////////////////////////second fetch//////////////////////////////////////////////////////
   await fetch('https://api.iextrading.com/1.0/stock/market/list/mostactive')
   .then(r=>r.json())
   .then(r=>{
+
     const stockMap = r.map((stock, i)=>{
       return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
     })
@@ -98,20 +94,12 @@ export default class App extends React.Component {
       })
     })
   })
-  .then(r => {
-    const symbol = this.state.infocustwo.map(stock=>{
-      fetch(`https://api.iextrading.com/1.0/stock/${stock.symbol}/logo`)
-      .then(r => r.json())
-      .then(r=>{
-        const logoUrl = r.url
-        this.setState(Object.assign(stock, {logo:logoUrl}))
-      })
-    })
-  })
+
 /////////////////////////////////////third fetch//////////////////////////////////////////////////////////
 await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 .then(r=>r.json())
 .then(r=>{
+
   const stockMap = r.map((stock, i)=>{
     return {symbol:stock.symbol, companyName: stock.companyName, openPrice: stock.open}
   })
@@ -125,16 +113,6 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
     .then(r =>{
        const priceToFloor = Math.floor(r[0].open)
        this.setState(Object.assign(stock, {oneYrPrice:priceToFloor}))
-    })
-  })
-})
-.then(r => {
-  const symbol = this.state.infocusthree.map(stock=>{
-    fetch(`https://api.iextrading.com/1.0/stock/${stock.symbol}/logo`)
-    .then(r => r.json())
-    .then(r=>{
-      const logoUrl = r.url
-      this.setState(Object.assign(stock, {logo:logoUrl}))
     })
   })
 })
@@ -156,6 +134,7 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
       //there are two here because the first one gets spliced after being compared with r for post to backend. The second method is all stocks backend and fetched but uniq versions of it. one method for backend one for frontend.
 
     //find unique values between r and unique array
+
     for( var i=uniqArray.length - 1; i>=0; i--){
      	for( var j=0; j<r.length; j++){
      	    if(uniqArray[i] && (uniqArray[i].symbol === r[j].symbol)){
@@ -191,14 +170,18 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
    //this gives only uniq stocks for stock model
 //////////////////////////////////fetch portfoliostocks/////////////////////////////////////////////////////////////////////////////////////////////
 
-  handleStocksViewedAfterLogin = () => {
+  handleStocksViewedAfterLogin =  async () => {
 
-   fetch('http://localhost:3000/api/v1/portfoliostocks')//what user sees////////////////////////////////////////
+    await fetch('http://localhost:3000/api/v1/portfoliostocks')//what user sees////////////////////////////////////////
    .then(r=>r.json())
    .then(r=>{
 
      let usersViewableStocksNotInPortfolio = r.filter(portfoliostock=> portfoliostock.user.id === this.state.user.id)
+     //get the stocks who s user id matches logged in id
+
      let allStocks = [...this.state.allstocksbeforeportfolio]
+
+
 
      for( var i=allStocks.length - 1; i>=0; i--){
       	for( var j=0; j<usersViewableStocksNotInPortfolio.length; j++){
@@ -207,6 +190,8 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
          	}
          }
      }
+     
+
     //this fetches portfoliostocks of all users. then finds current user. then compares stocks that current user owns with all stocks and filters stocks for user to see that user does not own already.
 
      this.setState({infocusmerged:allStocks})
@@ -231,7 +216,7 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 //     let Allstocksbeforeportfolio = [...this.state.allstocksbeforeportfolio]
 //      let portfolioSymbols = r.map(stock=> stock.stock.symbol)
 //      let inFocusMerged = portfolioSymbols.map(stock => {
-//        debugger
+//
 //          return Allstocksbeforeportfolio.map((stocktwo, i) =>{
 //            return stock.symbol === stocktwo.symbol? Allstocksbeforeportfolio.splice(i, 1) : stocktwo
 //          })
@@ -269,6 +254,10 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 //     })
 //   }
 
+  chosenStockToPurchase = (symbol) => {
+    this.setState({chosenStockToPurchase: symbol})
+  }
+
   render(){//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return(
       <Router>
@@ -287,61 +276,30 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
             chosenStockUrls={this.state.chosenStockUrls}
             account={this.state.account}
             chosenStockUrlsClone={this.state.chosenStockUrlsClone[0]}
+            handleStocksViewedAfterLogin={this.handleStocksViewedAfterLogin}
             />
           }
         />
-        <Route exact path='/portfolio' render={props => <Portfolio handleAccount={this.handleAccount} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
+        <Route exact path='/Available' render={props => <Available handleAccount={this.handleAccount} chosenStockToPurchase={this.chosenStockToPurchase} user={this.state.user} portfolioStocksSetState={this.portfolioStocksSetState} {...props} user={this.state.user} chosenStockUrls={this.state.chosenStockUrls} account={this.state.account}/>}
+        />
+        <Route
+        exact path='/BuyStocks'
+        render={props =><BuyStocks
+        {...props}
+        account={this.state.account}
+        stockToPurchase={this.state.chosenStockToPurchase}
+        user={this.state.user}
+        />}
+        />
+        <Route
+        exact path='/Portfolio'
+        render={props =><Portfolio
+        {...props}
+        user={this.state.user}
+        />}
         />
         </div>
       </Router>
     )
   }
 }//end of class//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-////////////////////////////////end of component did mount////////////////////////////////////////////////////
-
-  // filterUniqStocks = (IFT, symbol) => {
-  //    let newArray = [];
-  //    let lookupObject  = {};
-  //
-  //    for(var i in IFT) {
-  //       lookupObject[IFT[i][symbol]] = IFT[i];
-  //    }
-  //
-  //    for(i in lookupObject) {
-  //        newArray.push(lookupObject[i]);
-  //    }
-  //     return newArray;
-  // }
-
-
-
-
-  //awesome compare two arrays and remove duplicates
-  //////////////////////////////////////////
-  //       var myArray = [
-  //   {name: 'deepak', place: 'bangalore'},
-  //   {name: 'chirag', place: 'bangalore'},
-  //   {name: 'alok', place: 'berhampur'},
-  //   {name: 'chandan', place: 'mumbai'}
-  // ];
-  // var toRemove = [
-  //   {name: 'deepak', place: 'bangalore'},
-  //   {name: 'alok', place: 'berhampur'}
-  // ];
-  //
-  // for( var i=myArray.length - 1; i>=0; i--){
-  //  	for( var j=0; j<toRemove.length; j++){
-  //  	    if(myArray[i] && (myArray[i].name === toRemove[j].name)){
-  //     		myArray.splice(i, 1);
-  //     	}
-  //     }
-  // }
-  //////////////////////////////////////////////

@@ -11,14 +11,17 @@ export default class Navbar extends Component {
     // </Header></Container>
     return (
       <Segment clearing>
-        <Header as='h3' as={Link} to='/choosestocks'  floated='left'>
+        <Header as='h3' color='green' as={Link} to='/choosestocks'  floated='left'>
           Home
         </Header>
-        <Header as='h3' as={Link} to='/portfolio'  floated='left'>
+        <Header as='h3' color='blue' as={Link} to='/Available'  floated='left'>
+        Stocks Available for Purchase
+        </Header>
+        <Header as='h3' color='red' as={Link} to='/portfolio'  floated='left'>
         Portfolio
         </Header>
-        <Header as='h3' floated='left'>
-        ${this.props.account}
+        <Header as='h3' color='orange' floated='left'>
+        Account: ${this.props.account}
         </Header>
         <Header as='h3' inverted color='blue' floated='right'>
         <Icon name='earlybirds' />
