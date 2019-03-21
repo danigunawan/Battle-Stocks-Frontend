@@ -1,6 +1,6 @@
 import React from 'react'
 import Stock from './Stock'
-import { Icon, Divider, Segment, Container, Grid, Image, Button } from 'semantic-ui-react'
+import { Icon, Divider, Segment, Container, Grid, Button } from 'semantic-ui-react'
 
 export default class Stocks extends React.Component {
 

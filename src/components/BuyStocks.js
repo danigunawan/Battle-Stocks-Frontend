@@ -8,7 +8,9 @@ export default class BuyStocks extends React.Component {
     shares: '',
     stocks:[],
     symbol:'',
-    stockId:null,
+    stockId:'',
+    newStockValue: null,
+    currentBankAccount: null
   }
 
   componentDidMount(){
@@ -19,63 +21,72 @@ export default class BuyStocks extends React.Component {
     })
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault()
-    const accountBalance = this.props.account - (this.state.price * this.state.shares)
-    this.setState({symbol:this.props.stockToPurchase},()=>{
+    let stockValue = this.state.price * this.state.shares
+    if (this.state.shares > Math.floor(this.props.account / this.state.price)){
+      alert(`Shares must be under ${Math.floor(this.props.account / this.state.price)}`)
+      this.props.history.push('/BuyStocks')
+    }else{
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`)
+    .then(r=>r.json())
+    .then(r=>{
+      this.setState({newStockValue: parseInt((r.stock_account + stockValue).toFixed(2)), currentBankAccount:parseInt((r.account - stockValue).toFixed(2))})
+    })
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        stock_account: this.state.newStockValue,
+        bank_account: this.state.currentBankAccount
+      })
+    })//fetch end
 
-    return this.state.shares > Math.floor(this.props.account / this.state.price)? alert(`Shares must be under ${Math.floor(this.props.account / this.state.price)}`)
-    :
-    <></>
-    // fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`)
-    // .then(r=>r.json())
-    // .then(r=>{
-    //   debugger
-    //   this.setState({stocks:r.stocks},()=>{
-    //   let stock = this.state.stocks.filter(stock=>stock.symbol === this.state.symbol)
-    //   this.setState({stockId:stock.id}, () =>{
-    //   fetch('http://localhost:3000/api/v1/portfoliostocks', {
-    //     method: 'PATCH',
-    //     headers: {
-    //               'Content-Type': 'application/json',
-    //               'Accept': 'application/json'
-    //             },
-    //             body: JSON.stringify({
-    //               user_id: this.props.user.id,
-    //               stock_id: this.state.stockId,
-    //               win: true,
-    //               portfolio: true
-    //             })
-    // })
-    //
-    // })
-    // })
-    // })
-    debugger
+    await this.setState({symbol:this.props.stockToPurchase})
+
+    await fetch(`http://localhost:3000/api/v1/portfoliostocks`)
+    .then(r=>r.json())
+    .then(r=>{
+      const selectedStock = r.find(stock => stock.symbol === this.props.stockToPurchase)
+      this.setState({stockId:selectedStock.stock_id}, () =>{
+
+      const selectedStockIndex = r.findIndex(stock => stock.user_id === this.props.user.id && stock.stock_id === this.state.stockId)+1
+
+      fetch(`http://localhost:3000/api/v1/portfoliostocks/${selectedStockIndex}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          'owned':true
+        })
+      })
+    })
+    })
+
+    this.props.setAccountState(this.state.currentBankAccount, this.state.newStockValue)
+
+      await fetch('http://localhost:3000/api/v1/portfolios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: this.props.user.id,
+          symbol:this.props.stockToPurchase,
+          shares:this.state.shares,
+          stock_id:this.state.stockId
+        })
+      })//fetch end
+
     this.props.history.push('/Portfolio')
-  })
-  }//handlesubmit end
-
-
-  // .then(data => {
-  //       fetch(`https://travsketball.herokuapp.com/api/v1/users/1/trips/${this.props.tripId}`, {
-  //         method: 'PATCH',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'Accept': 'application/json'
-  //         },
-  //         body: JSON.stringify({
-  //           completed: true
-  //         })
-  //       })
-  //       .then(window.location.href = '/trip-list')
-  //     })
-
-
-
-
-
-
+  }//end of if else statement
+}//handle submit end
 
   handleChange(e) {
     this.setState({
@@ -88,7 +99,7 @@ export default class BuyStocks extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <label>Stock: {this.props.stockToPurchase}</label><br />
         <br />
-        <label>Price Per Share: ${this.state.price}</label><br />
+        <label>Price Per Share: ${parseInt(this.state.price)}</label><br />
         <br />
         <label>Account Balance: ${this.props.account}</label><br />
         <br />

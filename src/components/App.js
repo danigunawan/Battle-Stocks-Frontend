@@ -6,7 +6,6 @@ import Stocks from './Stocks'
 import Available from './Available'
 import BuyStocks from './BuyStocks';
 import Portfolio from './Portfolio';
-
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, NavLink, Redirect } from "react-router-dom";
 
@@ -19,6 +18,7 @@ export default class App extends React.Component {
     infocustwo:[],
     infocus:[],
     account: null,
+    stockAccount: null,
     user:null,
     chosenStockUrls:[],
     navBarHidden: true,
@@ -26,33 +26,82 @@ export default class App extends React.Component {
     chosenStockToPurchase: null
   }
 
+  setAccountState = (account, stockAccount) => {
+
+    this.setState({account, stockAccount})
+  }
+
   findUser = async (username) => {
     await fetch('http://localhost:3000/api/v1/users')
     .then(r=>r.json())
     .then(r=>{
       const foundUser = r.find(user => user.username === username)
-      this.setState({user:foundUser, account:foundUser.bank_account})
+      this.setState({user:foundUser, account:foundUser.account,
+        stockAccount: foundUser.stock_account})
     })
-    }
+    .then(r=>{
+    fetch(`http://localhost:3000/api/v1/users/${this.state.user.id}`)
+      .then(r => r.json())
+      .then(r=>{
+      let result = [];
+      const map = new Map();
 
-  changeAccountAndUserState = (account, username) => {
-    if (account <= 0){
-      Window.alert("Your Bank Account is 0 so you will receive $10 reset")
-      this.setState({account:10, username:username})
-    }else{
-      this.setState({account:account, username:username})
-    }
-  }
+      for (const item of r.portfolios) {
+          if(!map.has(item.symbol)){
+              map.set(item.symbol, true);    // set any value to Map
+              result.push({
+                  user_id: item.user_id,
+                  shares: item.shares,
+                  symbol: item.symbol,
+                  stock_id: item.stock_id,
+                  account: r.account,
+                  stock_account: r.stock_account
+              });
+          }
+      }//end of for loop
+
+      let account = 0
+      Promise.all(result.map(async(stock)=>{
+      await fetch(`https://api.iextrading.com/1.0/stock/${stock.symbol}/batch?types=quote,news`)
+        .then(r=>r.json())
+        .then(r=>{
+
+          account += parseInt((r.quote.latestPrice * stock.shares).toFixed(2))
+        })
+      }))//map end
+      .then(r=>{
+        this.handleAccount(account)
+        ////////////////////////////////////////////////////////////////////////////////////good
+      })//end of promise
+    })//end of top promise
+    })
+  }//finduser end
+
+  handleAccount = async(accountChange) => {
+      await fetch(`http://localhost:3000/api/v1/users/${this.state.user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          stock_account: accountChange
+        })
+      })//fetch end
+      await fetch(`http://localhost:3000/api/v1/users/${this.state.user.id}`)
+      .then(r=>r.json())
+      .then(r=>{
+        this.setState({account: r.account})
+      })
+    }//handleAccount end
 
   navBarHiddenChange = () => {
     this.setState({navBarHidden:!this.state.navBarHidden})
   }
 
-  handleAccount = (accountChange) => {
-    this.setState({account: accountChange})
-  }
 ////////////////////////////////////////////////////component did mount/////////////////////////////////////////
   async componentDidMount() {
+
     await fetch('https://api.iextrading.com/1.0/stock/market/list/infocus')
     .then(r=>r.json())
     .then(r=>{
@@ -118,7 +167,7 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 })
 
 /////////////////////////////////////////////////////////end of fetches from iex//////////////////////////////////
-  await fetch('http://localhost:3000/api/v1/stocks')
+  await fetch(`http://localhost:3000/api/v1/stocks`)
   .then(r=>r.json())
   .then(r=>{
 
@@ -170,13 +219,13 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
    //this gives only uniq stocks for stock model
 //////////////////////////////////fetch portfoliostocks/////////////////////////////////////////////////////////////////////////////////////////////
 
-  handleStocksViewedAfterLogin =  async () => {
+  handleStocksViewedAfterLogin = async() => {
 
     await fetch('http://localhost:3000/api/v1/portfoliostocks')//what user sees////////////////////////////////////////
    .then(r=>r.json())
    .then(r=>{
 
-     let usersViewableStocksNotInPortfolio = r.filter(portfoliostock=> portfoliostock.user.id === this.state.user.id)
+     let usersViewableStocksNotInPortfolio = r.filter(portfoliostock=> portfoliostock.user_id === this.state.user.id)
      //get the stocks who s user id matches logged in id
 
      let allStocks = [...this.state.allstocksbeforeportfolio]
@@ -185,49 +234,19 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
 
      for( var i=allStocks.length - 1; i>=0; i--){
       	for( var j=0; j<usersViewableStocksNotInPortfolio.length; j++){
-      	    if(allStocks[i] && (allStocks[i].symbol === usersViewableStocksNotInPortfolio[j].stock.symbol)){
+
+      	    if(allStocks[i] && (allStocks[i].symbol === usersViewableStocksNotInPortfolio[j].symbol)){
          		allStocks.splice(i, 1);
          	}
          }
      }
-     
-
     //this fetches portfoliostocks of all users. then finds current user. then compares stocks that current user owns with all stocks and filters stocks for user to see that user does not own already.
 
-     this.setState({infocusmerged:allStocks})
+    this.setState({infocusmerged:allStocks})
     //here we set users will see stocks, then head to choosestocks
   })//promise
 }//function end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//     let Allstocksbeforeportfolio = [...this.state.allstocksbeforeportfolio]
-//      let portfolioSymbols = r.map(stock=> stock.stock.symbol)
-//      let inFocusMerged = portfolioSymbols.map(stock => {
-//
-//          return Allstocksbeforeportfolio.map((stocktwo, i) =>{
-//            return stock.symbol === stocktwo.symbol? Allstocksbeforeportfolio.splice(i, 1) : stocktwo
-//          })
-//        })
-//       this.setState({infocusmerged: inFocusMerged})
-//   })
-//
-//
-// }///end of async component did mount////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//
   pushStockIntoChosenStockUrlsState = (symbol) => {
      const selectedStock = this.state.infocusmerged.find(stock => stock.symbol === symbol)
 
@@ -242,29 +261,22 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
    this.setState({chosenStockUrls:[]})
  }
 
-// //   fetch('http://localhost:3000/api/v1/profile', {
-// //   method: 'GET',
-// //   headers: {
-// //     Authorization: `Bearer localStorage.token <token>`
-// //   }
-//
-//   handlePortfolioStocks = (userStocksPortfolio) => {
-//   let portfolioSymbols = userStocksPortfolio.map(user =>{
-//       return user.stock.symbol
-//     })
-//   }
-
   chosenStockToPurchase = (symbol) => {
     this.setState({chosenStockToPurchase: symbol})
   }
-
   render(){//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     return(
       <Router>
         <div>
+
+        {this.state.navBarHidden ? null :
+          <Route render={props => <Navbar {...props} handleNavBarHome={this.handleNavBarHome} account={this.state.account} stockAccount={this.state.stockAccount}/>}
+          />}
+
         <Route exact path='/' render={props => <Login handleStocksViewedAfterLogin={this.handleStocksViewedAfterLogin} findUser={this.findUser} {...props} user={this.state.user} changeAccountAndUserState={this.changeAccountAndUserState} navBarHiddenChange={this.navBarHiddenChange}/>}
         />
-        {(this.state.navBarHidden) ? null : <Navbar handleNavBarHome={this.handleNavBarHome} account={this.state.account}/>}
+
         <Route exact path='/choosestocks' render={props => <Stocks {...props}  chosenStockUrlsLength={this.state.chosenStockUrls.length} chosenStockUrls={this.state.chosenStockUrls} pushStockIntoChosenStockUrlsState={this.pushStockIntoChosenStockUrlsState} infocus={this.state.infocusmerged} />}
         />
         <Route exact path='/Chosenstockchart1'
@@ -275,8 +287,10 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
             user={this.state.user}
             chosenStockUrls={this.state.chosenStockUrls}
             account={this.state.account}
+            stockAccount={this.state.stockAccount}
             chosenStockUrlsClone={this.state.chosenStockUrlsClone[0]}
             handleStocksViewedAfterLogin={this.handleStocksViewedAfterLogin}
+            setAccountState={this.setAccountState}
             />
           }
         />
@@ -289,6 +303,8 @@ await fetch('https://api.iextrading.com/1.0/stock/market/list/gainers')
         account={this.state.account}
         stockToPurchase={this.state.chosenStockToPurchase}
         user={this.state.user}
+        setAccountState={this.setAccountState}
+
         />}
         />
         <Route

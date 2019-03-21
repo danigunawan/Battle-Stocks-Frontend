@@ -7,8 +7,7 @@ import {
   HorizontalGridLines,
   VerticalBarSeries
 } from 'react-vis';
-import { Label, Divider, Container, Button, Icon, Grid, Image, Form, List } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Label, Container, Button, Icon, Grid, Form, List } from 'semantic-ui-react'
 
 export default class Chosenstockchart1 extends React.Component{
   state = {
@@ -64,25 +63,8 @@ export default class Chosenstockchart1 extends React.Component{
     return this.state.guessedPriceRight && this.state.guessedIncreaseDecreaseRight ? this.setState({won:!this.state.won}, () => this.handleWin()) : this.state.guessedPriceRight || this.state.guessedIncreaseDecreaseRight? this.setState({halflost:!this.state.halflost}, () => this.handleHalfLost()) : this.setState({completelylost: !this.state.completelylost}, () => this.handleCompletelyLost())
   }
 
-  patchBankAccount = (accountChange) => {
-    if (accountChange <= 0){
-      Window.alert("Your Bank Account is 0 so you will receive $10 reset")
-      fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          bank_account: 10
-        })
-      })//fetch end
-      .then(r=>{
-        this.props.handleAccount(accountChange)
-        // this.props.clearChosenStockUrlsState()
-      })
-    }else{
-    fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+  patchBankAccount = async (accountChange) => {
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -91,17 +73,14 @@ export default class Chosenstockchart1 extends React.Component{
       body: JSON.stringify({
         bank_account: accountChange
       })
-    })//fetch end
-    .then(r=>{
-      this.props.handleAccount(accountChange)
-      // this.props.clearChosenStockUrlsState()
     })
-  }
+
+      this.props.setAccountState(accountChange, this.props.stockAccount)
 }////////////////////////////////////////////////////patchBankAccountEnd
 
   handleWin = async () => {
     this.props.clearChosenStockUrlsState()
-    let accountChange = parseInt(this.props.account) + (parseInt(this.state.bet) * 2)
+    let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) * 2)).toFixed(2))
 
     await fetch('http://localhost:3000/api/v1/stocks')
     .then(r=>r.json())
@@ -118,11 +97,10 @@ export default class Chosenstockchart1 extends React.Component{
         body: JSON.stringify({
           user_id: this.props.user.id,
           stock_id: selectedStockId.id,
-          win:true
+          win:true,
+          owned:false
         })
       })//fetch end
-      debugger
-      this.props.handleStocksViewedAfterLogin()
     })
 
     this.patchBankAccount(accountChange)
@@ -130,7 +108,7 @@ export default class Chosenstockchart1 extends React.Component{
 
   handleHalfLost = async () => {
     this.props.clearChosenStockUrlsState()
-    let accountChange = parseInt(this.props.account) + (parseInt(this.state.bet) / 2)
+    let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) / 2)).toFixed(2))
 
     await fetch('http://localhost:3000/api/v1/stocks')
     .then(r=>r.json())
@@ -149,14 +127,13 @@ export default class Chosenstockchart1 extends React.Component{
       })
     })//fetch end
         })
+
         this.patchBankAccount(accountChange)
-        debugger
-        this.props.handleStocksViewedAfterLogin()
       }//handle half lost
 
   handleCompletelyLost = async () =>{
     this.props.clearChosenStockUrlsState()
-    let accountChange = ((parseInt(this.props.account) + parseInt(this.state.bet)) - 500)
+    let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) - 500)).toFixed(2))
 
     await fetch('http://localhost:3000/api/v1/stocks')
     .then(r=>r.json())
@@ -178,7 +155,6 @@ export default class Chosenstockchart1 extends React.Component{
 
     })
     this.patchBankAccount(accountChange)
-    this.props.handleStocksViewedAfterLogin()
   }//complete lost////////////////////////////////////////////
 
   async componentDidMount() {
@@ -194,6 +170,10 @@ export default class Chosenstockchart1 extends React.Component{
       })
     })
   }//end of handleCompanyInfo////////////////
+
+  handleClick = () => {
+    this.props.history.push('/Available')
+  }
 
   render(){
     return (
@@ -267,15 +247,12 @@ export default class Chosenstockchart1 extends React.Component{
               <div>
               <h3>Price Per Share Today: ${this.props.chosenStockUrlsClone.openPrice}
               </h3>
-              <br /><Button as={Link} to='/Available'>Stocks Available to Purchase</Button>
+              <br /><button onClick={this.handleClick}> Stocks Available to Purchase</button>
               </div>
             :
               <></>
             }
             </Container>
-
-
-
             {this.state.completelylost || this.state.won || this.state.halflost? <></> :
 
               <XYPlot margin={{bottom: 70}} xType="ordinal" width={300} height={300}>
@@ -293,15 +270,6 @@ export default class Chosenstockchart1 extends React.Component{
             }
 
             </Grid.Column>
-
-
-
-
-
-
-
-
-
             <Grid.Column>
                 {this.state.increase?
                     <></>
@@ -365,9 +333,6 @@ export default class Chosenstockchart1 extends React.Component{
                       {this.state.input === ''? <></> : <Button type='submit'>Submit</Button>}
                     </Form>
                   }
-
-
-
               </Grid.Column>
                 </Grid.Row>
                 </Grid>
@@ -375,28 +340,3 @@ export default class Chosenstockchart1 extends React.Component{
     )
   }//render end
 }//class end
-
-
-
-
-
-
-
-
-
-
-
-// {/*onChange={event => {this.setState({input: event.target.value})}}*/}
-
-
-// <input
-// type="integer"
-// placeholder="Bet?"
-// onChange={event => {this.setState({bet: event.target.value})}}
-// />
-
-// <Form.Field
-// label="Bet?"
-// color='red'
-// size="large"
-// />

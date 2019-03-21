@@ -15,22 +15,17 @@ export default class Login extends React.Component {
     })
   }
 
-  findUser = () => {
-    this.props.findUser(this.state.username)
-  }
-
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
       e.preventDefault()
-      axios.post('http://localhost:3000/api/v1/login', {
+      await axios.post('http://localhost:3000/api/v1/login', {
               username: this.state.username,
               password: this.state.password
       })
       .then(r => {
-        this.findUser()
+
+        this.props.findUser(this.state.username)
         localStorage.setItem('token', r.data.jwt)
-        this.props.changeAccountAndUserState(r.data.user.bank_account, r.data.user.username)
         this.props.navBarHiddenChange()
-        
         this.props.handleStocksViewedAfterLogin()
         this.props.history.push('/choosestocks')
       })

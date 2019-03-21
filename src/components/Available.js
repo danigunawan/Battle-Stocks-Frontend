@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Divider, Segment, Container, Grid, Image, Button } from 'semantic-ui-react'
+import { Icon, Container, Grid, Button } from 'semantic-ui-react'
 
 export default class Available extends React.Component {
 
@@ -18,7 +18,8 @@ export default class Available extends React.Component {
     .then(r => r.json())
     .then(r=>{
       let filteredUser = r.filter(portfoliostock=> portfoliostock.user_id === this.props.user.id)
-      let filteredUserWins = filteredUser.filter(stock=>stock.win)
+      let filteredUserWins = filteredUser.filter(stock=>stock.win && !stock.owned)
+
       this.setState({filteredUserWins})
       })
     }
@@ -30,7 +31,6 @@ export default class Available extends React.Component {
 
 
   render(){
-
     return (
       <div>
       <Container textAlign='center'>
@@ -39,23 +39,22 @@ export default class Available extends React.Component {
        {this.state.filteredUserWins.map(userstocks => {
             return (
             <Grid.Column>
-            <h2>{userstocks.stock.name}</h2>
+            <h2>{userstocks.name}</h2>
             <Button
-              onClick={props =>this.handleClick(userstocks.stock.symbol)}
+              onClick={props =>this.handleClick(userstocks.symbol)}
               animated='fade'
               basic size="big"
               color={this.randomItem()}
             >
               <Button.Content visible >
-                {userstocks.stock.symbol}
+                {userstocks.symbol}
               </Button.Content>
               <Button.Content hidden>
               <Icon size="large" name='earlybirds' />
               </Button.Content>
             </Button>
-
-            <h2>One Year Price: {userstocks.stock.oneYrPrice}</h2>
-            <h2>Today's Price: {userstocks.stock.openPrice}</h2>
+            <h2>One Year Price: {userstocks.oneYrPrice}</h2>
+            <h2>Today's Price: {userstocks.openPrice}</h2><br />
             </Grid.Column>
           )
         })}
@@ -66,10 +65,3 @@ export default class Available extends React.Component {
     )
   }
 }
-
-
-//   fetch('http://localhost:3000/api/v1/profile', {
-//   method: 'GET',
-//   headers: {
-//     Authorization: `Bearer localStorage.token <token>`
-//   }
