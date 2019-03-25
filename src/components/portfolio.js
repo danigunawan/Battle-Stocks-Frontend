@@ -1,5 +1,5 @@
 import React from 'react'
-
+import '../css/Portfolio.css'
 export default class Portfolio extends React.Component {
   state = {
     stockinfo: [],
@@ -43,15 +43,16 @@ export default class Portfolio extends React.Component {
       return (
         <div>{this.state.uniqStocks.map(stock => {
               return (
-                <>
-              <h1>{stock.symbol}</h1>
-              <h1>Current Value: {stock.currentValue}</h1>
-              <h1>Latest Price: {stock.price}</h1>
-              <h1>News: {stock.headline}</h1>
-              <h1>{stock.summary}</h1>
-              <h1>{stock.url}</h1>
-              <h1>Source:{stock.source}</h1>
-              </>
+
+              <div class="container">
+              <h2 id="symbol">{stock.symbol}</h2>
+        <h2 id="value">Current Value: {stock.currentValue}</h2>
+              <h2 id="latest"> Latest Price: {stock.price}</h2>
+              <h2 id="news">News: {stock.headline}</h2>
+              <h3 id="summary">{stock.summary}</h3>
+              <h3 id="url"><a href={stock.url} target="_blank">{stock.url}</a></h3>
+              <h4 id="source">{stock.source}</h4>
+              </div>
             )
             })}
         </div>

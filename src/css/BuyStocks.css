@@ -1,0 +1,18 @@
+
+.buy{
+  grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+    display: grid;
+    font-size: 2em;
+  /* grid-template-rows: 1fr 1fr; */
+}
+#buy2{
+  grid-column: 2/3;
+  text-align: center;
+  /* grid-row: 1/2; */
+  padding-top: 3em;
+  word-wrap: break-word;
+}
+#available{
+  padding-bottom: 1em;
+}

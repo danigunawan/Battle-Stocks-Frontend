@@ -1,6 +1,7 @@
 import React from 'react'
 // import { Redirect } from 'react-router-dom';
 import axios from 'axios'
+import "../css/Login.css"
 
 export default class Login extends React.Component {
 
@@ -33,21 +34,22 @@ export default class Login extends React.Component {
 
   render(){
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-            <input type="text" name="username" value={this.state.username} onChange={e => this.handleChange(e)}/>
-            <label>Username</label>
-          </div>
-          <div>
-            <input type="password" name="password" value={this.state.password} onChange={e => this.handleChange(e)}/>
-            <label>Password</label>
-          </div>
-            <input type="submit" value="Login" />
-        </form>
-      </div>
-    )
-  }
-}
+      <body >
 
-// this.window.alert('wrong username/password')
+        <form onSubmit={this.handleSubmit}>
+        <div class="container">
+        <h1 id="login">BattleStocks</h1>
+             <label id="username" for="username">Username</label><br />
+            <input id="username2" placeholder="username" type="text" name="username" value={this.state.username} onChange={e => this.handleChange(e)}/><br />
+          <label id="password" for="password">Password</label><br />
+            <input id="password2" placeholder="password" type="password" name="password" value={this.state.password} onChange={e => this.handleChange(e)}/><br />
+            <div class="stuff">
+            <button class="btn" type="submit">Submit</button>
+            </div>
+            </div>
+        </form>
+
+      </body>
+    )
+}
+}

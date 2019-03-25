@@ -1,5 +1,5 @@
 import React from 'react'
-
+import '../css/BuyStocks.css'
 
 export default class BuyStocks extends React.Component {
 
@@ -96,19 +96,22 @@ export default class BuyStocks extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form class="buy" onSubmit={this.handleSubmit}>
+        <container id="buy2">
         <label>Stock: {this.props.stockToPurchase}</label><br />
-        <br />
+        <br /><br />
         <label>Price Per Share: ${parseInt(this.state.price)}</label><br />
         <br />
         <label>Account Balance: ${this.props.account}</label><br />
         <br />
-        <label>Shares available to buy based on your account balance: {Math.floor(this.props.account / this.state.price)}</label><br />
-        <br />
+        <div id="available">
+        <label >Shares available to buy: {Math.floor(this.props.account / this.state.price)}</label><br />
+        </div>
         <label>Shares:</label>
         <input type='integer' name="shares" value={this.state.shares} onChange={e => this.handleChange(e)}/>
         <br /><br />
         <input type="submit" value="Purchase"/>
+        </container>
       </form>
     )
   }
