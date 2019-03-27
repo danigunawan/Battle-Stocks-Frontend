@@ -78,7 +78,7 @@ export default class App extends React.Component {
   }//finduser end
 
   handleAccount = async(accountChange) => {
-    debugger
+
       await fetch(`http://localhost:3000/api/v1/users/${this.state.user.id}`, {
         method: 'PATCH',
         headers: {
