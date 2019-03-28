@@ -64,7 +64,7 @@ export default class Chosenstockchart1 extends React.Component{
   }
 
   patchBankAccount = async (accountChange) => {
-    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`, {
+    await fetch(`https://battlestocksbackend.herokuapp.com/api/v1/users/${this.props.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -82,13 +82,13 @@ export default class Chosenstockchart1 extends React.Component{
     this.props.clearChosenStockUrlsState()
     let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) * 2)).toFixed(2))
 
-    await fetch('http://localhost:3000/api/v1/stocks')
+    await fetch('https://battlestocksbackend.herokuapp.com/api/v1/stocks')
     .then(r=>r.json())
     .then(r=>{
 
       const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrlsClone.symbol)
 
-      fetch('http://localhost:3000/api/v1/portfoliostocks', {
+      fetch('https://battlestocksbackend.herokuapp.com/api/v1/portfoliostocks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,11 +110,11 @@ export default class Chosenstockchart1 extends React.Component{
     this.props.clearChosenStockUrlsState()
     let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) / 2)).toFixed(2))
 
-    await fetch('http://localhost:3000/api/v1/stocks')
+    await fetch('https://battlestocksbackend.herokuapp.com/api/v1/stocks')
     .then(r=>r.json())
     .then(r=>{
     const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrlsClone.symbol)
-    fetch('http://localhost:3000/api/v1/portfoliostocks', {
+    fetch('https://battlestocksbackend.herokuapp.com/api/v1/portfoliostocks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -135,12 +135,12 @@ export default class Chosenstockchart1 extends React.Component{
     this.props.clearChosenStockUrlsState()
     let accountChange = parseInt((parseInt(this.props.account) + (parseInt(this.state.bet) - 500)).toFixed(2))
 
-    await fetch('http://localhost:3000/api/v1/stocks')
+    await fetch('https://battlestocksbackend.herokuapp.com/api/v1/stocks')
     .then(r=>r.json())
     .then(r=>{
     const selectedStockId = r.find(stock =>stock.symbol === this.props.chosenStockUrlsClone.symbol)
 
-    fetch('http://localhost:3000/api/v1/portfoliostocks', {
+    fetch('https://battlestocksbackend.herokuapp.com/api/v1/portfoliostocks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

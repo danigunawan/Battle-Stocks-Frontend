@@ -7,7 +7,7 @@ export default class Portfolio extends React.Component {
   }
 
    async componentWillMount(){
-    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`)
+    await fetch(`https://battlestocksbackend.herokuapp.com/api/v1/users/${this.props.user.id}`)
       .then(r => r.json())
       .then(r=>{
       let result = [];
