@@ -28,12 +28,12 @@ export default class BuyStocks extends React.Component {
       alert(`Shares must be under ${Math.floor(this.props.account / this.state.price)}`)
       this.props.history.push('/BuyStocks')
     }else{
-    await fetch(`https://battlestocksbackend.herokuapp.com/api/v1/users/${this.props.user.id}`)
+    await fetch(`https://localhost:3000/api/v1/users/${this.props.user.id}`)
     .then(r=>r.json())
     .then(r=>{
       this.setState({newStockValue: parseInt((r.stock_account + stockValue).toFixed(2)), currentBankAccount:parseInt((r.account - stockValue).toFixed(2))})
     })
-    await fetch(`https://battlestocksbackend.herokuapp.com/api/v1/users/${this.props.user.id}`, {
+    await fetch(`https://localhost:3000/api/v1/users/${this.props.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default class BuyStocks extends React.Component {
 
     await this.setState({symbol:this.props.stockToPurchase})
 
-    await fetch(`https://battlestocksbackend.herokuapp.com/api/v1/portfoliostocks`)
+    await fetch(`https://localhost:3000/api/v1/portfoliostocks`)
     .then(r=>r.json())
     .then(r=>{
       const selectedStock = r.find(stock => stock.symbol === this.props.stockToPurchase)
@@ -55,7 +55,7 @@ export default class BuyStocks extends React.Component {
 
       const selectedStockIndex = r.findIndex(stock => stock.user_id === this.props.user.id && stock.stock_id === this.state.stockId)+1
 
-      fetch(`https://battlestocksbackend.herokuapp.com/api/v1/portfoliostocks/${selectedStockIndex}`, {
+      fetch(`https://localhost:3000/${selectedStockIndex}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export default class BuyStocks extends React.Component {
 
     this.props.setAccountState(this.state.currentBankAccount, this.state.newStockValue)
 
-      await fetch('https://battlestocksbackend.herokuapp.com/api/v1/portfolios', {
+      await fetch('https://localhost:3000/api/v1/portfolios', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
