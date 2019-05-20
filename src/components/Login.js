@@ -17,14 +17,14 @@ export default class Login extends React.Component {
   }
 
     handleSubmit = async (e) => {
-      
+
       e.preventDefault()
       await axios.post('http://localhost:3000/api/v1/login', {
               username: this.state.username,
               password: this.state.password
       })
       .then(r => {
-        debugger
+        
         this.props.findUser(this.state.username)
         localStorage.setItem('token', r.data.jwt)
         this.props.navBarHiddenChange()

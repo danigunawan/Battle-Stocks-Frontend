@@ -7,7 +7,7 @@ export default class Portfolio extends React.Component {
   }
 
    async componentWillMount(){
-    await fetch(`https://localhost:3000/api/v1/users/${this.props.user.id}`)
+    await fetch(`http://localhost:3000/api/v1/users/${this.props.user.id}`)
       .then(r => r.json())
       .then(r=>{
       let result = [];
@@ -30,7 +30,7 @@ export default class Portfolio extends React.Component {
     })///////////////////////////////////////////good
       // this.stockPrice()
       Promise.all(this.state.uniqStocks.map(async(stock)=>{
-      await fetch(`https://api.iextrading.com/1.0/stock/${stock.symbol}/batch?types=quote,news,chart/1d`)
+      await fetch(`http://api.iextrading.com/1.0/stock/${stock.symbol}/batch?types=quote,news,chart/1d`)
         .then(r=>r.json())
         .then(r=>{
           this.setState(Object.assign(stock, {currentValue:r.quote.close * stock.shares, price:r.quote.latestPrice, headline:r.news[0].headline, source: r.news[0].source, url:r.news[0].url, summary: r.news[0].summary}))

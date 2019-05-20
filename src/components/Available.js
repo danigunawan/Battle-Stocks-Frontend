@@ -14,7 +14,7 @@ export default class Available extends React.Component {
   }
 
   async componentDidMount(){
-  await fetch('https://localhost:3000/api/v1/portfoliostocks')
+  await fetch('http://localhost:3000/api/v1/portfoliostocks')
     .then(r => r.json())
     .then(r=>{
       let filteredUser = r.filter(portfoliostock=> portfoliostock.user_id === this.props.user.id)
